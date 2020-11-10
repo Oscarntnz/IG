@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# VSCode files
+.vscode/*
+.vscode
+*.code-workspace
+
+# arhcivos
+*.pdf
