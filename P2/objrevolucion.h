@@ -49,7 +49,7 @@ class ObjRevolucion : public Malla3D
         // Atributos
 
         std::vector<Tupla3f> perfil;
-        std::pair<bool,bool> tapas;
+        std::pair<bool,bool> tapas;     // tapas: superior, inferior
         EnumEjes eje_rotacion;
 
         // Funciones

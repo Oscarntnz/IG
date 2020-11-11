@@ -45,7 +45,7 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
    float f_rotacion = 0;
    int a = 0, b = 0;
 
-   M = perfil.size();
+   M = perfil_original.size();
    N = num_instancias;
 
    ordenarPuntos();
@@ -53,7 +53,7 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
 
    // Añadir los vertices
 
-   for(int i = 0; i <= N; ++i){
+   for(int i = 0; i < N; ++i){
       f_rotacion = (2*M_PI*i)/N;
       for(int j = 0; j < M; ++j){
             v_actual = calcularVectorRotado(j, f_rotacion);
@@ -63,8 +63,10 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
 
    // Añadir polos
 
-   tabla_v.push_back(polo_i);
-   tabla_v.push_back(polo_s);
+   if(tapas.second)
+      tabla_v.push_back(polo_i);
+   if(tapas.first)
+      tabla_v.push_back(polo_s);
 
    // Añadir caras
 
@@ -82,9 +84,10 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
    for(auto it = tabla_v.begin(); it != tabla_v.end(); ++it)
       v.push_back(*it);
 
-   for(auto it = tabla_c.begin(); it != tabla_c.end(); ++it)
+   for(auto it = tabla_c.begin(); it != tabla_c.end(); ++it){
       f.push_back(*it);
-
+   }
+   
    anadirTapas();
 
 }
@@ -101,13 +104,16 @@ void ObjRevolucion::ordenarPuntos(){
 }
 
 void ObjRevolucion::eliminarPolos(){
-   if(tapas.first)
-      polo_s = perfil.back();
-   if(tapas.second)
-      polo_i = perfil.front();
 
-      perfil.pop_back();
-      perfil.erase(perfil.begin());   
+   if(tapas.first){
+         polo_s = perfil.back();
+         perfil.pop_back();
+      
+   }
+   if(tapas.second){
+      polo_i = perfil.front();
+      perfil.erase(perfil.begin());
+   } 
 }
 
 Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
@@ -124,8 +130,8 @@ Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
       salida(EnumEjes::E_Z) = perfil[j](EnumEjes::E_X)*-sin(factor_rotacion) + perfil[j](EnumEjes::E_Z)*cos(factor_rotacion);
    }
    else{
-      salida(EnumEjes::E_X) = perfil[j](EnumEjes::E_X)*cos(factor_rotacion) + perfil[j](EnumEjes::E_Z)*-sin(factor_rotacion);
-      salida(EnumEjes::E_Y) = perfil[j](EnumEjes::E_X)*sin(factor_rotacion) + perfil[j](EnumEjes::E_Z)*cos(factor_rotacion);
+      salida(EnumEjes::E_X) = perfil[j](EnumEjes::E_X)*cos(factor_rotacion) + perfil[j](EnumEjes::E_Y)*-sin(factor_rotacion);
+      salida(EnumEjes::E_Y) = perfil[j](EnumEjes::E_X)*sin(factor_rotacion) + perfil[j](EnumEjes::E_Y)*cos(factor_rotacion);
       salida(EnumEjes::E_Z) = perfil[j](EnumEjes::E_Z);
    }
 
@@ -133,12 +139,25 @@ Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
 }
 
 void ObjRevolucion::anadirTapas(){
-   if(tapas.second)
-      for (int i = 0; i < N; i++)
-         f.push_back({(int)v.size()-2, M*(i+1), M*i});
+   int a = 0, b = 0;
+
+   // tapa superior
 
    if(tapas.first)
-      for(int i = 0; i < N; ++i)
-         f.push_back({(int)v.size()-1, (M*(i+1))%(M*N) + N - 1, (M*i)%(M*N) + N - 1});
+      for (int i = 0; i < N; i++){
+         a = M*(i + 1) - 1;
+         b = a + N;
+         f.push_back({a, M*N + 1, b});
+      }   
+
+   // tapa inferior
+
+   if(tapas.second)
+      for (int i = 0; i < N; i++){
+         a = M*i;
+         b = M*((i + 1)%N);
+         f.push_back({a, M*N, b});
+      }
+
 
 }

@@ -23,15 +23,15 @@ Escena::Escena(): menu_ctl(), objetos_escena(0)
     cubo = new Cubo(100);
     tetraedro = new Tetraedro(100);
     objply = new ObjPLY("./plys/beethoven");
-    cono = new Cono(100, 50, 50);
-    cilindro = new Cilindro(2, 25, 100, 25);
+    cono = new Cono(3, 10, 100, 50, EnumEjes::E_Y);
+    cilindro = new Cilindro(4, 25, 100, 50, EnumEjes::E_Y);
 
     objetos_escena.push_back(cubo);
     objetos_escena.push_back(tetraedro);
     objetos_escena.push_back(objply);
     objetos_escena.push_back(cilindro);
     objetos_escena.push_back(cono);
-    //objetos_escena.push_back(nullptr);
+    //objetos_escena.push_back(esfera);
 }
 
 //**************************************************************************

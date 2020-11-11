@@ -80,6 +80,7 @@ class Malla3D
 
    void calcular_normales() ;       // calcula tabla de normales de vértices (práctica 3)
    void rellenar_v_colores();       // rellena el vector de colores
+   void rellenar_v_ajedrez();       // rellena el vector de caras del modo ajedrez
    void reserva_espacio(unsigned int vertices, unsigned int caras);  // reserva espacio en todos los vectores
    void reserva_espacio(); // reserva espacio en todos los vectores una vez ya tenemos v y f
 

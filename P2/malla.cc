@@ -211,7 +211,8 @@ void Malla3D::escalar(float factor){
 }
 
 void Malla3D::rellenar_v_colores(){
-   if(c_i.size() == 0 || c_d.size() == 0 || c_p.size() == 0 || c_l.size() == 0 || c_a.size() == 0 || c_a_2.size() == 0)
+   if(c_i.size() == 0 || c_d.size() == 0 || c_p.size() == 0 ||
+   c_l.size() == 0 || c_a.size() == 0 || c_a_2.size() == 0)
       reserva_espacio();
 
    std::fill(c_i.begin(), c_i.end(), color_i);
@@ -220,32 +221,24 @@ void Malla3D::rellenar_v_colores(){
    std::fill(c_l.begin(), c_l.end(), color_puntos);
    std::fill(c_a.begin(), c_a.end(), color_ajedrez_1);
    std::fill(c_a_2.begin(), c_a_2.end(), color_ajedrez_2);
-
-   for(unsigned int i = 0, j = 0, k = 0; i < f.size(); i++){
-      if(i%2 == 0){
-         a[j] = f[i];
-         j++;
-      }
-      else{
-         a_2[k] = f[i];
-         k++;
-      }
-   }
-}
-
-void Malla3D::reserva_espacio(unsigned int vertices, unsigned int caras){
-   v.resize(vertices);
-   f.resize(caras);
-   reserva_espacio();
 }
 
 void Malla3D::reserva_espacio(){
-   a.resize(f.size()/2);
-   a_2.resize(f.size()/2);
    c_i.resize(v.size());
    c_d.resize(v.size());
    c_p.resize(v.size());
    c_l.resize(v.size());
-   c_a.resize(3*a.size());
-   c_a_2.resize(3*a_2.size());
+   c_a.resize(f.size());
+   c_a_2.resize(f.size());
+}
+
+void Malla3D::rellenar_v_ajedrez(){
+   //Inicializacion de las tablas para el modo ajedrez
+
+   for(unsigned int i = 0; i < f.size(); ++i){
+      if(i%2 == 0)
+         a.push_back(f[i]);
+      else
+         a_2.push_back(f[i]);
+   }
 }
