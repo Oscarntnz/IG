@@ -9,10 +9,11 @@
 #include "menuctl.h"
 #include "cono.h"
 #include "cilindro.h"
+#include "esfera.h"
 
-class MenuCtl;
+//class MenuCtl;
 
-typedef enum {NADA, SELOBJETO,SELVISUALIZACION,SELDIBUJADO} menu;
+typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO, SELTAPA} menu;
 
 class Escena
 {
@@ -21,7 +22,7 @@ class Escena
 
     //Variables
 
-    enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, NULO};
+    enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, REVO = 6, NULO};
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
 
@@ -29,7 +30,7 @@ class Escena
     
     void cambiar_dibujado(ModoDibujado modo);
     void cambiar_visualizacion(ModoVisualizacion modo);
-    void ajusta_ply();
+    void cambiaTapas(bool inferior, bool superior);
 
  // ** PARÁMETROS DE LA CÁMARA (PROVISIONAL)
        
@@ -57,6 +58,11 @@ class Escena
    ObjPLY * objply = nullptr;
    Cono * cono = nullptr;
    Cilindro * cilindro = nullptr;
+   Esfera * esfera = nullptr;
+   ObjRevolucion * objrevo = nullptr;
+
+   // Posiciones
+   std::vector<Tupla3f> pos_objetos;
 
    
    public:

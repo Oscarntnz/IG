@@ -27,7 +27,7 @@ class ObjPLY: public Malla3D {
         std::string nombre;
 
     public:
-        ObjPLY(const std::string & nombre_archivo);
+        ObjPLY(const std::string & nombre_archivo, float factor_escala = 1.0);
         const std::string & getNombre();
         
 };

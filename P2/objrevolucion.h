@@ -31,11 +31,14 @@ class ObjRevolucion : public Malla3D
         ObjRevolucion();
         ObjRevolucion(const std::string & archivo, int num_instancias, EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup=true, bool tapa_inf=true);
         ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_instancias, EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup=true, bool tapa_inf=true);
+        
+        void toggleTapas(bool inferior, bool superior);
+
     private:
         // Atributos
-        std::vector<Tupla3f> tabla_v;   // tabla de vertices
+        std::vector<Tupla3f> tabla_v;   // tabla de vértices
         std::vector<Tupla3i> tabla_c;   // tabla de caras
-        int M, N;
+        int M, N;                       // número de vértices del perfil y número de rotaciones
         Tupla3f polo_s, polo_i;
 
         // Funciones
@@ -43,18 +46,21 @@ class ObjRevolucion : public Malla3D
         void ordenarPuntos();
         void eliminarPolos();
         Tupla3f calcularVectorRotado(int j, float factor_rotacion);
-        void anadirTapas();
+        void anadirTapas(bool inferior, bool superior);
+        void eliminarTapas(bool inferior, bool superior);
+        void crearPolos();      // calcula los polos, si no los tiene
 
     protected:
         // Atributos
 
         std::vector<Tupla3f> perfil;
-        std::pair<bool,bool> tapas;     // tapas: superior, inferior
+        std::pair<bool,bool> tapas;     // tapas: inerior, superior
         EnumEjes eje_rotacion;
 
         // Funciones
 
-        void crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias);
+        void crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias, bool conTapas);
+        void crearPerfilDebug();
 
 } ;
 

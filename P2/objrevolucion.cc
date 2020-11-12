@@ -19,11 +19,13 @@ ObjRevolucion::ObjRevolucion() {}
 
 ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias, EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf): tabla_c(0), tabla_v(0){
    ply::read_vertices(archivo, perfil);
-   tapas.first = tapa_sup;
-   tapas.second = tapa_inf;
+   tapas.first = tapa_inf;
+   tapas.second = tapa_sup;
    eje_rotacion = rotacion_eje;
 
-   crearMalla(perfil, num_instancias);
+   crearMalla(perfil, num_instancias, (tapas.first && tapas.second));
+
+   escalar(20);
 }
 
 // *****************************************************************************
@@ -31,25 +33,28 @@ ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias, En
 
  
 ObjRevolucion::ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_instancias, EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf): tabla_c(0), tabla_v(0){
-   perfil.assign(perfil_original.begin(), perfil_original.end());
-   tapas.first = tapa_sup;
-   tapas.second = tapa_inf;
+   tapas.first = tapa_inf;
+   tapas.second = tapa_sup;
    eje_rotacion = rotacion_eje;
 
-   crearMalla(perfil_original, num_instancias);
+   crearMalla(perfil_original, num_instancias, (tapas.first && tapas.second));
 }
 
-void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias){
+void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias, bool conTapas){
+   tipo_malla = TipoMalla::OBJREVO;
+   
    Tupla3f v_actual = {0.0, 0.0, 0.0};
    Tupla3i c_actual = {0, 0, 0};
    float f_rotacion = 0;
    int a = 0, b = 0;
 
-   M = perfil_original.size();
-   N = num_instancias;
+   perfil.assign(perfil_original.begin(), perfil_original.end());
 
    ordenarPuntos();
-   eliminarPolos();
+   crearPolos();
+
+   M = perfil.size();
+   N = num_instancias;
 
    // Añadir los vertices
 
@@ -60,13 +65,6 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
             tabla_v.push_back(v_actual);
       }
    }
-
-   // Añadir polos
-
-   if(tapas.second)
-      tabla_v.push_back(polo_i);
-   if(tapas.first)
-      tabla_v.push_back(polo_s);
 
    // Añadir caras
 
@@ -81,6 +79,15 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
       }
    }
 
+   // Añadir polos
+
+   if(tapas.first)
+      tabla_v.push_back(polo_i);
+   if(tapas.second)
+      tabla_v.push_back(polo_s);
+
+   // Copiar las tablas a los vectores de vertices y caras
+
    for(auto it = tabla_v.begin(); it != tabla_v.end(); ++it)
       v.push_back(*it);
 
@@ -88,8 +95,10 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
       f.push_back(*it);
    }
    
-   anadirTapas();
+   anadirTapas(tapas.first, tapas.second);
 
+   rellenar_v_ajedrez();
+   rellenar_v_colores();
 }
 
 void ObjRevolucion::ordenarPuntos(){
@@ -101,19 +110,6 @@ void ObjRevolucion::ordenarPuntos(){
          auxiliar[i] = *it;
       perfil.swap(auxiliar);
    }
-}
-
-void ObjRevolucion::eliminarPolos(){
-
-   if(tapas.first){
-         polo_s = perfil.back();
-         perfil.pop_back();
-      
-   }
-   if(tapas.second){
-      polo_i = perfil.front();
-      perfil.erase(perfil.begin());
-   } 
 }
 
 Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
@@ -138,26 +134,139 @@ Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
    return salida;
 }
 
-void ObjRevolucion::anadirTapas(){
+void ObjRevolucion::anadirTapas(bool inferior, bool superior){
    int a = 0, b = 0;
-
-   // tapa superior
-
-   if(tapas.first)
-      for (int i = 0; i < N; i++){
-         a = M*(i + 1) - 1;
-         b = a + N;
-         f.push_back({a, M*N + 1, b});
-      }   
+   auto it = f.begin() + ((int)tabla_c.size() - 1);
 
    // tapa inferior
-
-   if(tapas.second)
+/*
+  if(inferior)
       for (int i = 0; i < N; i++){
          a = M*i;
          b = M*((i + 1)%N);
          f.push_back({a, M*N, b});
       }
 
+   // tapa superior
+   if(superior)
+      for (int i = 0; i < N; i++){
+         a = M*(i + 1) - 1;
+         b = (a + M)%(M*N);
+         f.push_back({b, M*N + (tapas.first? 1 : 0), a});
+      }
+*/
+
+   if(inferior){
+      for (int i = 0; i < N; i++){
+         a = M*i;
+         b = M*((i + 1)%N);
+         f.insert(it + i, {a, (int)v.size() - 2, b});
+      }
+      tapas.first = true;
+   }
+
+   // tapa superior
+   if(superior){
+      for (int i = 0; i < N; i++){
+         a = M*(i + 1) - 1;
+         b = (a + M)%(M*N);
+         f.push_back({b, (int)v.size() - 1, a});
+      }
+      tapas.second = true;
+   }
+
+}
+
+void ObjRevolucion::eliminarTapas(bool inferior, bool superior){
+   int a = 0, b = 0;
+
+   // tapa inferior
+   // si queremos eliminar la inferior y esta en la tabla
+   // la eliminamos
+
+   if(inferior && tapas.first){
+      auto it1 = f.begin() + ((int)tabla_c.size() - 1), it2 = (it1 + N);
+      f.erase(it1, it2);
+      tapas.first = false;
+   }
+
+   // tapa superior
+
+   if(superior && tapas.second){
+      for (int i = 0; i < N; i++)
+         f.pop_back();
+      
+      tapas.second = false;
+   }
+}
+
+void ObjRevolucion::crearPerfilDebug(){
+   for(auto it = perfil.begin(); it != perfil.end(); ++it)
+        v.push_back(*it);
+   
+   if(v.size() > 2)
+    for(int i = 0; i < (int)v.size() - 2; i++)
+        f.push_back({i%(int)v.size(),(i+1)%(int)v.size(),(i+2)%(int)v.size()});
+   else
+      f.push_back({0,1,2});
+}
+
+void ObjRevolucion::toggleTapas(bool inferior, bool superior){
+   if(inferior){
+      if(tapas.first)
+         eliminarTapas(true, false);
+      else
+         anadirTapas(true, false);
+   }
+
+   if(superior){
+      if(tapas.second)
+         eliminarTapas(false, true);
+      else
+         anadirTapas(false, true);
+   }
+
+   rellenar_v_ajedrez();
+
+}
+
+void ObjRevolucion::crearPolos(){
+   std::pair<bool,bool> los_tiene = std::make_pair(false, false);
+   EnumEjes eje_nulo, eje_nulo_2;
+
+   if(eje_rotacion == EnumEjes::E_X){
+      eje_nulo = EnumEjes::E_Y;
+      eje_nulo_2 = EnumEjes::E_Z;
+   }
+   else if(eje_rotacion == EnumEjes::E_Y){
+      eje_nulo = EnumEjes::E_X;
+      eje_nulo_2 = EnumEjes::E_Z;
+   }
+   else{
+      eje_nulo = EnumEjes::E_X;
+      eje_nulo_2 = EnumEjes::E_Y;
+   }
+
+   if(perfil.front()(eje_nulo) == 0 && perfil.front()(eje_nulo_2) == 0)
+      los_tiene.first = true;
+   if(perfil.back()(eje_nulo) == 0 && perfil.front()(eje_nulo_2) == 0)
+      los_tiene.second = true;
+
+   if(!los_tiene.first){
+      polo_i = perfil.front();
+      polo_i(eje_nulo) = 0;
+      polo_i(eje_nulo_2) = 0;
+   }
+   else
+      perfil.erase(perfil.begin());
+   
+
+   if(!los_tiene.second){
+      polo_s = perfil.back();
+      polo_s(eje_nulo) = 0;
+      polo_s(eje_nulo_2) = 0;
+   }
+   else
+      perfil.pop_back();
 
 }

@@ -233,12 +233,17 @@ void Malla3D::reserva_espacio(){
 }
 
 void Malla3D::rellenar_v_ajedrez(){
+   a.clear();
+   a_2.clear();
+
    //Inicializacion de las tablas para el modo ajedrez
 
-   for(unsigned int i = 0; i < f.size(); ++i){
+   unsigned int i;
+   auto it = f.begin();
+   for(i = 0; it != f.end(); ++i, ++it){
       if(i%2 == 0)
-         a.push_back(f[i]);
+         a.push_back(*it);
       else
-         a_2.push_back(f[i]);
+         a_2.push_back(*it);
    }
 }

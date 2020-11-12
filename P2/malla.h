@@ -20,10 +20,12 @@
 
 enum ModoDibujado{INMEDIATO, DIFERIDO, NINGUNO};
 enum ModoVisualizacion : unsigned int {PUNTOS = 0, LINEAS = 1, SOLIDO = 2, AJEDREZ = 3};
+enum TipoMalla{ESTANDAR, OBJREVO, OBJPLY};
 
 class Malla3D
 {
    public:
+
    // dibuja el objeto en modo inmediato
    void draw_ModoInmediato();
 
@@ -45,6 +47,10 @@ class Malla3D
    inline void cambiar_dibujado(ModoDibujado modo){
       if(modo_dibujo != modo)
          modo_dibujo = modo;
+   }
+
+   inline TipoMalla getTipoMalla(){
+      return tipo_malla;
    }
 
    void cambiar_visualizacion(ModoVisualizacion modo);
@@ -107,6 +113,8 @@ class Malla3D
    const Tupla3f color_lineas = {1.0,0.0,0.0};     // color de las lineas (rojas)
    const Tupla3f color_ajedrez_1 = {1.0,1.0,0.0};  // primer color modo ajedrez
    const Tupla3f color_ajedrez_2 = {0.0,0.0,0.0};  // segundo color modo ajedrez
+
+   TipoMalla tipo_malla = TipoMalla::ESTANDAR;
 
 } ;
 

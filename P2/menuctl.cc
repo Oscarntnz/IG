@@ -7,6 +7,7 @@ void MenuCtl::menuPrincipal(){
     std::cout << "\tD: Seleccion modo de dibujado" << std::endl;
     std::cout << "\tV: Seleccion modo de visualizacion" << std::endl;
     std::cout << "\tO: Seleccion de objeto" << std::endl;
+    std::cout << "\tT: Cambiar tapas" << std::endl;
     std::cout << "\tQ: Salir de la aplicacion" << std::endl;
 }
 
@@ -17,6 +18,8 @@ void MenuCtl::selObjeto(){
     std::cout << "\tP: Mostrar/ocultar objeto PLY" << std::endl;
     std::cout << "\tY: Mostrar/ocultar cono" << std::endl;
     std::cout << "\tH: Mostrar/ocultar cilindro" << std::endl;
+    std::cout << "\tE: Mostrar/ocultar esfera" << std::endl;
+    std::cout << "\tR: Mostrar/ocultar objeto revolución" << std::endl;
 }
 
 void MenuCtl::muestraObjeto(std::string tipo, bool visible){
@@ -35,6 +38,16 @@ void MenuCtl::selDibujado(){
     std::cout << "Modo seleccion de dibujado:" << std::endl;
     std::cout << "\t1: Modo inmediato" << std::endl;
     std::cout << "\t2: Modo diferido" << std::endl;
+}
+
+void MenuCtl::selTapa(){
+    std::cout << "Modo seleccion tapas:" << std::endl;
+    std::cout << "\t1: Cambiar tapa inferior" << std::endl;
+    std::cout << "\t2: Cambiar tapa superior" << std::endl;
+}
+
+void MenuCtl::muestraTapa(std::string tapa){
+    std::cout << "\t" << "Cambiada tapa " << " " << tapa << std::endl;
 }
 
 void MenuCtl::modoDibujado(std::string modo){

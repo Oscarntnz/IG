@@ -1,13 +1,19 @@
 #include "aux.h"     // includes de OpenGL/glut/glew, windows, y librería std de C++
 #include "escena.h"
 #include "malla.h" // objetos: Cubo y otros....
+#include "cubo.h"
+#include "tetraedro.h"
+#include "objply.h"
 #include "menuctl.h"
+#include "cono.h"
+#include "cilindro.h"
+#include "esfera.h"
 
 //**************************************************************************
 // constructor de la escena (no puede usar ordenes de OpenGL)
 //**************************************************************************
 
-Escena::Escena(): menu_ctl(), objetos_escena(0)
+Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
 {
     Front_plane       = 50.0;
     Back_plane        = 2000.0;
@@ -20,18 +26,29 @@ Escena::Escena(): menu_ctl(), objetos_escena(0)
 
     // crear los objetos de la escena
 
-    cubo = new Cubo(100);
-    tetraedro = new Tetraedro(100);
-    objply = new ObjPLY("./plys/beethoven");
-    cono = new Cono(3, 10, 100, 50, EnumEjes::E_Y);
-    cilindro = new Cilindro(4, 25, 100, 50, EnumEjes::E_Y);
+    cubo = new Cubo(25);
+    tetraedro = new Tetraedro(25);
+    objply = new ObjPLY("./plys/krillin", 7.5);
+    cilindro = new Cilindro(5, 25, 25, 12.5, EnumEjes::E_Y, true, true);
+    cono = new Cono(5, 100, 25, 12.5, EnumEjes::E_Y, true);
+    esfera = new Esfera(10, 20, 12.5, EnumEjes::E_Y, true, true);
+    objrevo = new ObjRevolucion("./plys/peon", 50);
 
     objetos_escena.push_back(cubo);
     objetos_escena.push_back(tetraedro);
     objetos_escena.push_back(objply);
     objetos_escena.push_back(cilindro);
     objetos_escena.push_back(cono);
-    //objetos_escena.push_back(esfera);
+    objetos_escena.push_back(esfera);
+    objetos_escena.push_back(objrevo);
+
+    pos_objetos.push_back({100.0, 0.0, 0.0});
+    pos_objetos.push_back({100.0, 100.0, 0.0});
+    pos_objetos.push_back({0.0, 0.0, 0.0});
+    pos_objetos.push_back({0.0, 0.0, 100.0});
+    pos_objetos.push_back({-100.0, 0.0, -100.0});
+    pos_objetos.push_back({-100.0, 0.0, 0.0});
+    pos_objetos.push_back({0.0,0.0,0.0/*-100.0, 0.0, 100.0*/});
 }
 
 //**************************************************************************
@@ -47,7 +64,7 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
 
 	glEnable( GL_DEPTH_TEST );	// se habilita el z-bufer
 
-   glEnable(GL_CULL_FACE);
+   //glEnable(GL_CULL_FACE);
 
 	Width  = UI_window_width/10;
 	Height = UI_window_height/10;
@@ -76,14 +93,16 @@ void Escena::dibujar()
 
     //   Dibujar los diferentes elementos de la escena
 
+   //Antiguo
    for(int i = 0; i < objetos_escena.size(); ++i){
       if(objeto_a_dibujar == Objetos(i) || objetos_escena[i]->get_visibility()){
-         if(objeto_a_dibujar == Objetos::PLY)
-            ajusta_ply();
-         objetos_escena[i]->draw();
-         objeto_a_dibujar == Objetos::NULO;
+         glPushMatrix();
+            glTranslatef(pos_objetos[i](EnumEjes::E_X),pos_objetos[i](EnumEjes::E_Y),pos_objetos[i](EnumEjes::E_Z));
+            objetos_escena[i]->draw();
+         glPopMatrix();
       }
    }
+   objeto_a_dibujar == Objetos::NULO;
 
    /*if(objeto_a_dibujar == Objetos::CUBO || cubo->get_visibility()){
       cubo->draw();
@@ -171,6 +190,11 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.muestraObjeto("tetraedro", tetraedro->get_visibility());
             modoMenu = NADA;
          }
+         // ESTAMOS EN MODO SELECCION DE TAPA
+         else if(modoMenu==NADA && modoMenu!=SELTAPA){
+            modoMenu=SELTAPA;
+            menu_ctl.selTapa();
+         }
          else
             menu_ctl.noValido();
 
@@ -207,6 +231,44 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
                objeto_a_dibujar = Objetos::NULO;
             }
             menu_ctl.muestraObjeto("cilindro", cilindro->get_visibility());
+            modoMenu = NADA;
+         }
+         else
+            menu_ctl.noValido();
+
+         break ;
+
+         case 'E' :
+         // ESTAMOS SELECCIONANDO LA ESFERA
+         if(modoMenu == SELOBJETO){
+            if(!esfera->get_visibility()){
+               objeto_a_dibujar = Objetos::ESFERA;
+               esfera->toggle_visibility();
+            }
+            else{
+               esfera->toggle_visibility();
+               objeto_a_dibujar = Objetos::NULO;
+            }
+            menu_ctl.muestraObjeto("esfera", esfera->get_visibility());
+            modoMenu = NADA;
+         }
+         else
+            menu_ctl.noValido();
+
+         break ;
+
+         case 'R' :
+         // ESTAMOS SELECCIONANDO EL OBJETO REVOLUCION
+         if(modoMenu == SELOBJETO){
+            if(!objrevo->get_visibility()){
+               objeto_a_dibujar = Objetos::REVO;
+               objrevo->toggle_visibility();
+            }
+            else{
+               objrevo->toggle_visibility();
+               objeto_a_dibujar = Objetos::NULO;
+            }
+            menu_ctl.muestraObjeto("objeto revolucion", objrevo->get_visibility());
             modoMenu = NADA;
          }
          else
@@ -308,6 +370,12 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.modoDibujado("inmediato");
             modoMenu=NADA;
          }
+         // ESTAMOS CAMBIANDO LA TAPA INFERIOR
+         else if (modoMenu==SELTAPA){
+            cambiaTapas(true, false);
+            menu_ctl.muestraTapa("inferior");
+            modoMenu=NADA;
+         }
          else
             menu_ctl.noValido();
          
@@ -317,6 +385,12 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          if (modoMenu==SELDIBUJADO){
             cambiar_dibujado(ModoDibujado::DIFERIDO);
             menu_ctl.modoDibujado("diferido");
+            modoMenu=NADA;
+         }
+         // ESTAMOS CAMBIANDO LA TAPA SUPERIOR
+         else if (modoMenu==SELTAPA){
+            cambiaTapas(false, true);
+            menu_ctl.muestraTapa("superior");
             modoMenu=NADA;
          }
          else
@@ -407,10 +481,9 @@ void Escena::cambiar_visualizacion(ModoVisualizacion modo){
       (*it)->cambiar_visualizacion(modo);
 }
 
-void Escena::ajusta_ply(){
-   if(objply->getNombre().compare("krillin") == 0){
-      glRotatef(-90, 1, 0, 0);
-      glRotatef(180, 0, 0, 1);
-   }
-   glScalef(30.0,30.0,30.0);
+void Escena::cambiaTapas(bool inferior, bool superior){
+   cono->toggleTapas(inferior, superior);
+   cilindro->toggleTapas(inferior, superior);
+   esfera->toggleTapas(inferior, superior);
+   objrevo->toggleTapas(inferior, superior);
 }
