@@ -23,7 +23,8 @@ ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias, En
    tapas.second = tapa_sup;
    eje_rotacion = rotacion_eje;
 
-   crearMalla(perfil, num_instancias, (tapas.first && tapas.second));
+   //crearPerfilDebug();
+   crearMalla(perfil, num_instancias, (tapas.first || tapas.second));
 
    escalar(20);
 }
@@ -37,7 +38,7 @@ ObjRevolucion::ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_insta
    tapas.second = tapa_sup;
    eje_rotacion = rotacion_eje;
 
-   crearMalla(perfil_original, num_instancias, (tapas.first && tapas.second));
+   crearMalla(perfil_original, num_instancias, (tapas.first || tapas.second));
 }
 
 void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias, bool conTapas){
@@ -79,13 +80,6 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
       }
    }
 
-   // Añadir polos
-
-   if(tapas.first)
-      tabla_v.push_back(polo_i);
-   if(tapas.second)
-      tabla_v.push_back(polo_s);
-
    // Copiar las tablas a los vectores de vertices y caras
 
    for(auto it = tabla_v.begin(); it != tabla_v.end(); ++it)
@@ -94,11 +88,13 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
    for(auto it = tabla_c.begin(); it != tabla_c.end(); ++it){
       f.push_back(*it);
    }
-   
-   anadirTapas(tapas.first, tapas.second);
 
-   rellenar_v_ajedrez();
-   rellenar_v_colores();
+   v.push_back(polo_i);
+   v.push_back(polo_s);
+
+   // Añadir polos y tapas
+
+   anadirTapas(tapas.first, tapas.second);
 }
 
 void ObjRevolucion::ordenarPuntos(){
@@ -136,31 +132,15 @@ Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
 
 void ObjRevolucion::anadirTapas(bool inferior, bool superior){
    int a = 0, b = 0;
-   auto it = f.begin() + ((int)tabla_c.size() - 1);
+   auto it = f.begin() + (int)tabla_c.size();
 
    // tapa inferior
-/*
-  if(inferior)
-      for (int i = 0; i < N; i++){
-         a = M*i;
-         b = M*((i + 1)%N);
-         f.push_back({a, M*N, b});
-      }
-
-   // tapa superior
-   if(superior)
-      for (int i = 0; i < N; i++){
-         a = M*(i + 1) - 1;
-         b = (a + M)%(M*N);
-         f.push_back({b, M*N + (tapas.first? 1 : 0), a});
-      }
-*/
 
    if(inferior){
       for (int i = 0; i < N; i++){
          a = M*i;
          b = M*((i + 1)%N);
-         f.insert(it + i, {a, (int)v.size() - 2, b});
+         f.insert(it + i, {a, M*N, b});
       }
       tapas.first = true;
    }
@@ -170,11 +150,13 @@ void ObjRevolucion::anadirTapas(bool inferior, bool superior){
       for (int i = 0; i < N; i++){
          a = M*(i + 1) - 1;
          b = (a + M)%(M*N);
-         f.push_back({b, (int)v.size() - 1, a});
+         f.push_back({b, M*N + 1, a});
       }
       tapas.second = true;
    }
 
+   rellenar_v_ajedrez();
+   rellenar_v_colores();
 }
 
 void ObjRevolucion::eliminarTapas(bool inferior, bool superior){
@@ -185,8 +167,8 @@ void ObjRevolucion::eliminarTapas(bool inferior, bool superior){
    // la eliminamos
 
    if(inferior && tapas.first){
-      auto it1 = f.begin() + ((int)tabla_c.size() - 1), it2 = (it1 + N);
-      f.erase(it1, it2);
+      auto it = f.begin() + tabla_c.size();
+      f.erase(it, it + N);
       tapas.first = false;
    }
 
@@ -198,9 +180,19 @@ void ObjRevolucion::eliminarTapas(bool inferior, bool superior){
       
       tapas.second = false;
    }
+
+   rellenar_v_ajedrez();
+   rellenar_v_colores();
 }
 
 void ObjRevolucion::crearPerfilDebug(){
+   std::pair<bool,bool> los_tiene;
+
+   crearPolos();
+
+   perfil.insert(perfil.begin(), polo_i);
+   perfil.push_back(polo_s);
+
    for(auto it = perfil.begin(); it != perfil.end(); ++it)
         v.push_back(*it);
    
@@ -209,6 +201,9 @@ void ObjRevolucion::crearPerfilDebug(){
         f.push_back({i%(int)v.size(),(i+1)%(int)v.size(),(i+2)%(int)v.size()});
    else
       f.push_back({0,1,2});
+
+   escalar(7.5);
+   rellenar_v_colores();
 }
 
 void ObjRevolucion::toggleTapas(bool inferior, bool superior){
@@ -227,10 +222,10 @@ void ObjRevolucion::toggleTapas(bool inferior, bool superior){
    }
 
    rellenar_v_ajedrez();
-
+   elimina_vbo();
 }
 
-void ObjRevolucion::crearPolos(){
+std::pair<bool,bool> ObjRevolucion::crearPolos(){
    std::pair<bool,bool> los_tiene = std::make_pair(false, false);
    EnumEjes eje_nulo, eje_nulo_2;
 
@@ -247,13 +242,15 @@ void ObjRevolucion::crearPolos(){
       eje_nulo_2 = EnumEjes::E_Y;
    }
 
-   if(perfil.front()(eje_nulo) == 0 && perfil.front()(eje_nulo_2) == 0)
+   polo_i = perfil.front();
+   polo_s = perfil.back();
+
+   if(polo_i(eje_nulo) == 0 && polo_i(eje_nulo_2) == 0)
       los_tiene.first = true;
-   if(perfil.back()(eje_nulo) == 0 && perfil.front()(eje_nulo_2) == 0)
+   if(polo_s(eje_nulo) == 0 && polo_s(eje_nulo_2) == 0)
       los_tiene.second = true;
 
    if(!los_tiene.first){
-      polo_i = perfil.front();
       polo_i(eje_nulo) = 0;
       polo_i(eje_nulo_2) = 0;
    }
@@ -262,11 +259,11 @@ void ObjRevolucion::crearPolos(){
    
 
    if(!los_tiene.second){
-      polo_s = perfil.back();
       polo_s(eje_nulo) = 0;
       polo_s(eje_nulo_2) = 0;
    }
    else
       perfil.pop_back();
 
+   return(los_tiene);
 }

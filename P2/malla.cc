@@ -7,6 +7,19 @@
 //
 // *****************************************************************************
 
+Malla3D::~Malla3D(){
+   v.clear();
+   f.clear();
+   a.clear();
+   a_2.clear();
+   c_i.clear();
+   c_d.clear();
+   c_p.clear();
+   c_l.clear();
+   c_a.clear();
+   c_a_2.clear();
+}
+
 // Visualización en modo inmediato con 'glDrawElements'
 
 void Malla3D::draw_ModoInmediato()
@@ -211,9 +224,7 @@ void Malla3D::escalar(float factor){
 }
 
 void Malla3D::rellenar_v_colores(){
-   if(c_i.size() == 0 || c_d.size() == 0 || c_p.size() == 0 ||
-   c_l.size() == 0 || c_a.size() == 0 || c_a_2.size() == 0)
-      reserva_espacio();
+   reserva_espacio();
 
    std::fill(c_i.begin(), c_i.end(), color_i);
    std::fill(c_d.begin(), c_d.end(), color_d);
@@ -224,12 +235,12 @@ void Malla3D::rellenar_v_colores(){
 }
 
 void Malla3D::reserva_espacio(){
-   c_i.resize(v.size());
-   c_d.resize(v.size());
-   c_p.resize(v.size());
-   c_l.resize(v.size());
-   c_a.resize(f.size());
-   c_a_2.resize(f.size());
+   c_i.clear(); c_d.clear(); c_p.clear();
+   c_l.clear(); c_a.clear(); c_a_2.clear();
+
+   c_i.resize(v.size()); c_d.resize(v.size());
+   c_p.resize(v.size()); c_l.resize(v.size());
+   c_a.resize(f.size()); c_a_2.resize(f.size());
 }
 
 void Malla3D::rellenar_v_ajedrez(){
@@ -245,5 +256,25 @@ void Malla3D::rellenar_v_ajedrez(){
          a.push_back(*it);
       else
          a_2.push_back(*it);
+   }
+}
+
+void Malla3D::elimina_vbo(){
+   // Si existen los buffer, los elimina pasa actualizar las nuevas caras, vertices o colores
+
+   if(id_vbo_ver != 0 && id_vbo_tri != 0 && id_vbo_col != 0 && id_vbo_aj1 != 0 && 
+   id_vbo_aj2 != 0 && id_vbo_pun != 0 && id_vbo_lin != 0 && id_vbo_ca1 != 0 && id_vbo_ca2 != 0){
+      
+      glDeleteBuffers(N_VBO, &id_vbo_ver);
+
+      id_vbo_ver = 0,               // id de VBO de vertices
+      id_vbo_tri = 0,               // id de VBO de triangulos
+      id_vbo_col = 0,               // id de VBO de colores
+      id_vbo_aj1 = 0,               // id de VBO de mitad de los triangulos ajedrez
+      id_vbo_aj2 = 0,               // id de VBO de otra mitad de los triangulos ajedrez
+      id_vbo_pun = 0,               // id de VBO de color de puntos
+      id_vbo_lin = 0,               // id de VBO de color de lineas
+      id_vbo_ca1 = 0,               // id de VBO de color de ajedrez 1
+      id_vbo_ca2 = 0;               // id de VBO de color de ajedrez 2
    }
 }

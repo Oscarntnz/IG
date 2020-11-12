@@ -26,6 +26,8 @@ class Malla3D
 {
    public:
 
+   virtual ~Malla3D();
+
    // dibuja el objeto en modo inmediato
    void draw_ModoInmediato();
 
@@ -61,6 +63,7 @@ class Malla3D
 
    // atributos privados
 
+   const int N_VBO = 9;
    GLuint id_vbo_ver = 0,        // id de VBO de vertices
    id_vbo_tri = 0,               // id de VBO de triangulos
    id_vbo_col = 0,               // id de VBO de colores
@@ -71,7 +74,7 @@ class Malla3D
    id_vbo_ca1 = 0,               // id de VBO de color de ajedrez 1
    id_vbo_ca2 = 0;               // id de VBO de color de ajedrez 2
 
-   bool visible = false;         // bool para hacer visible o invisible la malla
+   bool visible = true;         // bool para hacer visible o invisible la malla
    ModoDibujado modo_dibujo = ModoDibujado::INMEDIATO; // modo de dibjudado de la malla
    static const unsigned int N_MODOS_V = 4;             // nº de modos de visualizacion
    bool modos_visualizacion[N_MODOS_V] = {false, false, true, false}; // vector de bool para saber el tipo de visualizacion
@@ -89,6 +92,7 @@ class Malla3D
    void rellenar_v_ajedrez();       // rellena el vector de caras del modo ajedrez
    void reserva_espacio(unsigned int vertices, unsigned int caras);  // reserva espacio en todos los vectores
    void reserva_espacio(); // reserva espacio en todos los vectores una vez ya tenemos v y f
+   void elimina_vbo();
 
 
    // vectores de vertices

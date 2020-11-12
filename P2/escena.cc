@@ -15,40 +15,55 @@
 
 Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
 {
-    Front_plane       = 50.0;
-    Back_plane        = 2000.0;
-    Observer_distance = 4*Front_plane;
-    Observer_angle_x  = 0.0 ;
-    Observer_angle_y  = 0.0 ;
-    objeto_a_dibujar = Objetos::NULO;
+   Front_plane       = 50.0;
+   Back_plane        = 2000.0;
+   Observer_distance = 4*Front_plane;
+   Observer_angle_x  = 0.0 ;
+   Observer_angle_y  = 0.0 ;
+   objeto_a_dibujar = Objetos::NULO;
 
-    ejes.changeAxisSize(5000);
+   ejes.changeAxisSize(5000);
 
-    // crear los objetos de la escena
+   // crear los objetos de la escena
 
-    cubo = new Cubo(25);
-    tetraedro = new Tetraedro(25);
-    objply = new ObjPLY("./plys/krillin", 7.5);
-    cilindro = new Cilindro(5, 25, 25, 12.5, EnumEjes::E_Y, true, true);
-    cono = new Cono(5, 100, 25, 12.5, EnumEjes::E_Y, true);
-    esfera = new Esfera(10, 20, 12.5, EnumEjes::E_Y, true, true);
-    objrevo = new ObjRevolucion("./plys/peon", 50);
+   // perfil para probar el obj revo por perfil
+   std::vector<Tupla3f>perfil_ejemplo(0);
+   perfil_ejemplo.push_back({0.0, -15.0, 0.0});
+   perfil_ejemplo.push_back({10.0, -10.0, 0.0});
+   perfil_ejemplo.push_back({10.0, 10.0, 0.0});
+   perfil_ejemplo.push_back({0.0, 10.0, 0.0});
 
-    objetos_escena.push_back(cubo);
-    objetos_escena.push_back(tetraedro);
-    objetos_escena.push_back(objply);
-    objetos_escena.push_back(cilindro);
-    objetos_escena.push_back(cono);
-    objetos_escena.push_back(esfera);
-    objetos_escena.push_back(objrevo);
+   cubo = new Cubo(25);
+   tetraedro = new Tetraedro(25);
+   objply = new ObjPLY("./plys/krillin", 7.5);
+   cilindro = new Cilindro(5, 25, 25, 12.5, EnumEjes::E_Y, true, true);
+   cono = new Cono(5, 100, 25, 12.5, EnumEjes::E_Y, true);
+   esfera = new Esfera(10, 20, 12.5, EnumEjes::E_Y, true, true);
+   objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true);
 
-    pos_objetos.push_back({100.0, 0.0, 0.0});
-    pos_objetos.push_back({100.0, 100.0, 0.0});
-    pos_objetos.push_back({0.0, 0.0, 0.0});
-    pos_objetos.push_back({0.0, 0.0, 100.0});
-    pos_objetos.push_back({-100.0, 0.0, -100.0});
-    pos_objetos.push_back({-100.0, 0.0, 0.0});
-    pos_objetos.push_back({0.0,0.0,0.0/*-100.0, 0.0, 100.0*/});
+   objetos_escena.push_back(cubo);
+   objetos_escena.push_back(tetraedro);
+   objetos_escena.push_back(objply);
+   objetos_escena.push_back(cilindro);
+   objetos_escena.push_back(cono);
+   objetos_escena.push_back(esfera);
+   objetos_escena.push_back(objrevo);
+
+   pos_objetos.push_back({100.0, 0.0, 0.0});
+   pos_objetos.push_back({100.0, 100.0, 0.0});
+   pos_objetos.push_back({0.0, 0.0, 0.0});
+   pos_objetos.push_back({0.0, 0.0, 100.0});
+   pos_objetos.push_back({-100.0, 0.0, -100.0});
+   pos_objetos.push_back({-100.0, 0.0, 0.0});
+   pos_objetos.push_back({-100.0, 0.0, 100.0});
+
+   if(debug){
+      for(int i = 0; i < objetos_escena.size(); ++i){
+         objetos_escena[i]->toggle_visibility();
+         objetos_escena[i]->escalar(5.0);
+         pos_objetos[i] = {0.0, 0.0, 0.0};
+      }
+   }
 }
 
 //**************************************************************************
@@ -64,7 +79,8 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
 
 	glEnable( GL_DEPTH_TEST );	// se habilita el z-bufer
 
-   //glEnable(GL_CULL_FACE);
+   if(!debug)
+      glEnable(GL_CULL_FACE);
 
 	Width  = UI_window_width/10;
 	Height = UI_window_height/10;
@@ -103,24 +119,6 @@ void Escena::dibujar()
       }
    }
    objeto_a_dibujar == Objetos::NULO;
-
-   /*if(objeto_a_dibujar == Objetos::CUBO || cubo->get_visibility()){
-      cubo->draw();
-      objeto_a_dibujar == Objetos::NULO;
-   }
-   if(objeto_a_dibujar == Objetos::TETRAEDRO || tetraedro->get_visibility()){
-      tetraedro->draw();
-      objeto_a_dibujar == Objetos::NULO;
-   }
-   if(objeto_a_dibujar == Objetos::PLY || objply->get_visibility()){
-      ajusta_ply();
-      objply->draw();
-      objeto_a_dibujar == Objetos::NULO;
-   }
-   if(objeto_a_dibujar == Objetos::CONO || cono->get_visibility()){
-      cono->draw();
-      objeto_a_dibujar == Objetos::NULO;
-   }*/
 }
 
 //**************************************************************************
@@ -482,8 +480,14 @@ void Escena::cambiar_visualizacion(ModoVisualizacion modo){
 }
 
 void Escena::cambiaTapas(bool inferior, bool superior){
-   cono->toggleTapas(inferior, superior);
+   /*cono->toggleTapas(inferior, superior);
    cilindro->toggleTapas(inferior, superior);
    esfera->toggleTapas(inferior, superior);
-   objrevo->toggleTapas(inferior, superior);
+   objrevo->toggleTapas(inferior, superior);*/
+
+   // si es obj revolucion cambia las tapas
+
+   for(auto it = objetos_escena.begin(); it != objetos_escena.end(); ++it)
+      if((*it)->getTipoMalla() == TipoMalla::OBJREVO)
+         dynamic_cast<ObjRevolucion*>(*it)->toggleTapas(inferior, superior);
 }

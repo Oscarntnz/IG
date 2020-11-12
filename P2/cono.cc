@@ -6,7 +6,7 @@ Cono::Cono(const int num_vert_perfil, const int num_instancias_perf, const float
     this->altura = altura;
     this->radio = radio;
     tapas.first = tapa_inf;
-    tapas.second = false;
+    tapas.second = true;
     eje_rotacion = eje_r;
 
     float coordenada_variante_1 = 0,
