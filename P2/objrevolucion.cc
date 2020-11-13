@@ -2,7 +2,7 @@
 #include "objrevolucion.h"
 #include "ply_reader.h"
 #include <cmath>
-
+#include <limits>
 
 
 // *****************************************************************************
@@ -245,10 +245,14 @@ std::pair<bool,bool> ObjRevolucion::crearPolos(){
    polo_i = perfil.front();
    polo_s = perfil.back();
 
-   if(polo_i(eje_nulo) == 0 && polo_i(eje_nulo_2) == 0)
+   if(fabs(polo_i(eje_nulo)) < std::numeric_limits<float>::epsilon() &&
+   fabs(polo_i(eje_nulo_2)) < std::numeric_limits<float>::epsilon())
       los_tiene.first = true;
-   if(polo_s(eje_nulo) == 0 && polo_s(eje_nulo_2) == 0)
+   if(fabs(polo_s(eje_nulo)) < std::numeric_limits<float>::epsilon() &&
+   fabs(polo_s(eje_nulo_2)) < std::numeric_limits<float>::epsilon())
       los_tiene.second = true;
+
+   // Si no los tiene, creamos la proyeccion sobre el eje en el que rota
 
    if(!los_tiene.first){
       polo_i(eje_nulo) = 0;

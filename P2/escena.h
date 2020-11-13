@@ -11,8 +11,6 @@
 #include "cilindro.h"
 #include "esfera.h"
 
-//class MenuCtl;
-
 typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO, SELTAPA} menu;
 
 class Escena
@@ -25,7 +23,7 @@ class Escena
     enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, REVO = 6, NULO};
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
-    bool debug = true;
+    bool debug = false;
 
     //Funciones
     

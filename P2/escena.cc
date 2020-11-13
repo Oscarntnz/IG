@@ -74,8 +74,10 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
 
 void Escena::inicializar( int UI_window_width, int UI_window_height )
 {
-	//glClearColor( 1.0, 1.0, 1.0, 1.0 );// se indica cual sera el color para limpiar la ventana	(r,v,a,al)
-   glClearColor( 0.0, 0.05, 0.10, 1.0 );
+   if(!debug)
+	   glClearColor( 1.0, 1.0, 1.0, 1.0 );// se indica cual sera el color para limpiar la ventana	(r,v,a,al)
+   else
+      glClearColor( 0.0, 0.05, 0.10, 1.0 );
 
 	glEnable( GL_DEPTH_TEST );	// se habilita el z-bufer
 
