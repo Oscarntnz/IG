@@ -27,7 +27,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
    // crear los objetos de la escena
 
    // perfil para probar el obj revo por perfil
-   
+
    std::vector<Tupla3f>perfil_ejemplo(0);
    perfil_ejemplo.push_back({0.0, -15.0, 0.0});
    perfil_ejemplo.push_back({10.0, -10.0, 0.0});
@@ -37,7 +37,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
    cubo = new Cubo(25);
    tetraedro = new Tetraedro(25);
    objply = new ObjPLY("./plys/krillin", 7.5);
-   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_Y, true);
+   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_Y, false);
    cono = new Cono(2, 25, 25, 12.5, EnumEjes::E_Y, true);
    esfera = new Esfera(10, 25, 12.5, EnumEjes::E_Y, true);
    objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
@@ -116,7 +116,7 @@ void Escena::dibujar()
    for(int i = 0; i < objetos_escena.size(); ++i){
       if(objeto_a_dibujar == Objetos(i) || objetos_escena[i]->get_visibility()){
          glPushMatrix();
-            glTranslatef(pos_objetos[i](EnumEjes::E_X),pos_objetos[i](EnumEjes::E_Y),pos_objetos[i](EnumEjes::E_Z));
+            ajustar_objeto(i);
             objetos_escena[i]->draw();
          glPopMatrix();
       }
@@ -481,4 +481,8 @@ void Escena::cambiaTapas(){
    for(auto it = objetos_escena.begin(); it != objetos_escena.end(); ++it)
       if((*it)->getTipoMalla() == TipoMalla::OBJREVO)
          dynamic_cast<ObjRevolucion*>(*it)->toggleTapas();
+}
+
+void Escena::ajustar_objeto(int i){
+   glTranslatef(pos_objetos[i](EnumEjes::E_X),pos_objetos[i](EnumEjes::E_Y),pos_objetos[i](EnumEjes::E_Z));
 }

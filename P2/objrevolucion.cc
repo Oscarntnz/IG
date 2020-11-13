@@ -30,7 +30,7 @@ EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf, bool con_tapas): tabla_c(0)
    //crearPerfilDebug();
    crearMalla(perfil, instancias_perf, con_tapas);
 
-   escalar(20);
+   escalar(10);
 }
 
 // *****************************************************************************
@@ -98,12 +98,19 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
       f.push_back(*it);
    }
 
+   // Añadir polos y tapas
+
    v.push_back(polo_i);
    v.push_back(polo_s);
 
-   // Añadir polos y tapas
-
-   anadirTapas();
+   if(conTapas)
+      anadirTapas();
+   else
+   {
+      rellenar_v_ajedrez();
+      rellenar_v_colores();
+   }
+   
 }
 
 void ObjRevolucion::ordenarPuntos(){
@@ -210,7 +217,6 @@ void ObjRevolucion::toggleTapas(){
    else
       anadirTapas();
 
-   rellenar_v_ajedrez();
    elimina_vbo();
 }
 
