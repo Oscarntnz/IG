@@ -30,11 +30,13 @@ class ObjRevolucion : public Malla3D
     public:
         ObjRevolucion();
         ObjRevolucion(const std::string & archivo, int num_instancias, 
-        EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup = true, bool tapa_inf = true);
+        EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup = true, bool tapa_inf = true,
+        bool con_tapas = true);
         ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_instancias, 
-        EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup = true, bool tapa_inf = true);
+        EnumEjes rotacion_eje = EnumEjes::E_Y, bool tapa_sup = true, bool tapa_inf = true,
+        bool con_tapas = true);
         
-        void toggleTapas(bool inferior, bool superior);
+        void toggleTapas();
 
     private:
         // Atributos
@@ -48,15 +50,16 @@ class ObjRevolucion : public Malla3D
         void ordenarPuntos();
         void eliminarPolos();
         Tupla3f calcularVectorRotado(int j, float factor_rotacion);
-        void anadirTapas(bool inferior, bool superior);
-        void eliminarTapas(bool inferior, bool superior);
+        void anadirTapas();
+        void eliminarTapas();
         std::pair<bool,bool> crearPolos();      // calcula los polos, si no los tiene los crea, devuelve bool
                                                 // para saber si los tenia o no
     protected:
         // Atributos
 
         std::vector<Tupla3f> perfil;
-        std::pair<bool,bool> tapas;     // tapas: inerior, superior
+        bool tapas;
+        std::pair<bool, bool> tiene_tapas;      // para saber si le podemos añadir tapa superior o inferior
         EnumEjes eje_rotacion;
 
         // Funciones

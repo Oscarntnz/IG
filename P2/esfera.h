@@ -18,7 +18,7 @@ class Esfera: public ObjRevolucion
     public:
       Esfera();
       Esfera(const int num_vert_perfil = 10, const int num_instancias_perf = 20, const float radio = 1.0, 
-      EnumEjes eje_r = EnumEjes::E_Y, bool tapa_inf = true, bool tapa_sup = true);
+      EnumEjes eje_r = EnumEjes::E_Y, bool con_tapas = true);
     
     private:
       float radio;

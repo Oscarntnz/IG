@@ -27,6 +27,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
    // crear los objetos de la escena
 
    // perfil para probar el obj revo por perfil
+   
    std::vector<Tupla3f>perfil_ejemplo(0);
    perfil_ejemplo.push_back({0.0, -15.0, 0.0});
    perfil_ejemplo.push_back({10.0, -10.0, 0.0});
@@ -36,10 +37,10 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
    cubo = new Cubo(25);
    tetraedro = new Tetraedro(25);
    objply = new ObjPLY("./plys/krillin", 7.5);
-   cilindro = new Cilindro(5, 25, 25, 12.5, EnumEjes::E_Y, true, true);
-   cono = new Cono(5, 100, 25, 12.5, EnumEjes::E_Y, true);
-   esfera = new Esfera(10, 20, 12.5, EnumEjes::E_Y, true, true);
-   objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true);
+   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_Y, true);
+   cono = new Cono(2, 25, 25, 12.5, EnumEjes::E_Y, true);
+   esfera = new Esfera(10, 25, 12.5, EnumEjes::E_Y, true);
+   objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
 
    objetos_escena.push_back(cubo);
    objetos_escena.push_back(tetraedro);
@@ -191,9 +192,9 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             modoMenu = NADA;
          }
          // ESTAMOS EN MODO SELECCION DE TAPA
-         else if(modoMenu==NADA && modoMenu!=SELTAPA){
-            modoMenu=SELTAPA;
+         else if(modoMenu==NADA){
             menu_ctl.selTapa();
+            cambiaTapas();
          }
          else
             menu_ctl.noValido();
@@ -370,12 +371,6 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.modoDibujado("inmediato");
             modoMenu=NADA;
          }
-         // ESTAMOS CAMBIANDO LA TAPA INFERIOR
-         else if (modoMenu==SELTAPA){
-            cambiaTapas(true, false);
-            menu_ctl.muestraTapa("inferior");
-            modoMenu=NADA;
-         }
          else
             menu_ctl.noValido();
          
@@ -385,12 +380,6 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          if (modoMenu==SELDIBUJADO){
             cambiar_dibujado(ModoDibujado::DIFERIDO);
             menu_ctl.modoDibujado("diferido");
-            modoMenu=NADA;
-         }
-         // ESTAMOS CAMBIANDO LA TAPA SUPERIOR
-         else if (modoMenu==SELTAPA){
-            cambiaTapas(false, true);
-            menu_ctl.muestraTapa("superior");
             modoMenu=NADA;
          }
          else
@@ -481,7 +470,7 @@ void Escena::cambiar_visualizacion(ModoVisualizacion modo){
       (*it)->cambiar_visualizacion(modo);
 }
 
-void Escena::cambiaTapas(bool inferior, bool superior){
+void Escena::cambiaTapas(){
    /*cono->toggleTapas(inferior, superior);
    cilindro->toggleTapas(inferior, superior);
    esfera->toggleTapas(inferior, superior);
@@ -491,5 +480,5 @@ void Escena::cambiaTapas(bool inferior, bool superior){
 
    for(auto it = objetos_escena.begin(); it != objetos_escena.end(); ++it)
       if((*it)->getTipoMalla() == TipoMalla::OBJREVO)
-         dynamic_cast<ObjRevolucion*>(*it)->toggleTapas(inferior, superior);
+         dynamic_cast<ObjRevolucion*>(*it)->toggleTapas();
 }

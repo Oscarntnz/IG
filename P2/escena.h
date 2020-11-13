@@ -11,7 +11,7 @@
 #include "cilindro.h"
 #include "esfera.h"
 
-typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO, SELTAPA} menu;
+typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO} menu;
 
 class Escena
 {
@@ -23,13 +23,13 @@ class Escena
     enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, REVO = 6, NULO};
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
-    bool debug = false;
+    bool debug = true;
 
     //Funciones
     
     void cambiar_dibujado(ModoDibujado modo);
     void cambiar_visualizacion(ModoVisualizacion modo);
-    void cambiaTapas(bool inferior, bool superior);
+    void cambiaTapas();
 
  // ** PARÁMETROS DE LA CÁMARA (PROVISIONAL)
        

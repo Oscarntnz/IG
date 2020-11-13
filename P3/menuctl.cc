@@ -41,13 +41,7 @@ void MenuCtl::selDibujado(){
 }
 
 void MenuCtl::selTapa(){
-    std::cout << "Modo seleccion tapas:" << std::endl;
-    std::cout << "\t1: Cambiar tapa inferior" << std::endl;
-    std::cout << "\t2: Cambiar tapa superior" << std::endl;
-}
-
-void MenuCtl::muestraTapa(std::string tapa){
-    std::cout << "\t" << "Cambiada tapa " << " " << tapa << std::endl;
+    std::cout << "\t" << "Cambiada tapas" << std::endl;
 }
 
 void MenuCtl::modoDibujado(std::string modo){

@@ -15,7 +15,6 @@ class MenuCtl
         void selVisualizacion();
         void selDibujado();
         void selTapa();
-        void muestraTapa(std::string tapa);
         void modoDibujado(std::string modo);
         void cambiado(std::string loCambiado);
         void noValido();

@@ -17,14 +17,18 @@
 
 ObjRevolucion::ObjRevolucion() {}
 
-ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias, EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf): tabla_c(0), tabla_v(0){
+ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias,
+EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf, bool con_tapas): tabla_c(0), tabla_v(0){
    ply::read_vertices(archivo, perfil);
-   tapas.first = tapa_inf;
-   tapas.second = tapa_sup;
    eje_rotacion = rotacion_eje;
+   tiene_tapas.first = tapa_inf;
+   tiene_tapas.second = tapa_sup;
+   
+   int instancias_perf = num_instancias;
+   if(instancias_perf < 2) instancias_perf = 2;
 
    //crearPerfilDebug();
-   crearMalla(perfil, num_instancias, (tapas.first || tapas.second));
+   crearMalla(perfil, instancias_perf, con_tapas);
 
    escalar(20);
 }
@@ -33,16 +37,21 @@ ObjRevolucion::ObjRevolucion(const std::string & archivo, int num_instancias, En
 // objeto de revolución obtenido a partir de un perfil (en un vector de puntos)
 
  
-ObjRevolucion::ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_instancias, EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf): tabla_c(0), tabla_v(0){
-   tapas.first = tapa_inf;
-   tapas.second = tapa_sup;
+ObjRevolucion::ObjRevolucion(std::vector<Tupla3f> perfil_original, int num_instancias,
+EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf, bool con_tapas): tabla_c(0), tabla_v(0){
    eje_rotacion = rotacion_eje;
+   tiene_tapas.first = tapa_inf;
+   tiene_tapas.second = tapa_sup;
 
-   crearMalla(perfil_original, num_instancias, (tapas.first || tapas.second));
+   int instancias_perf = num_instancias;
+   if(instancias_perf < 2) instancias_perf = 2;
+
+   crearMalla(perfil_original, instancias_perf, con_tapas);
 }
 
 void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_instancias, bool conTapas){
    tipo_malla = TipoMalla::OBJREVO;
+   tapas = false;
    
    Tupla3f v_actual = {0.0, 0.0, 0.0};
    Tupla3i c_actual = {0, 0, 0};
@@ -94,7 +103,7 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
 
    // Añadir polos y tapas
 
-   anadirTapas(tapas.first, tapas.second);
+   anadirTapas();
 }
 
 void ObjRevolucion::ordenarPuntos(){
@@ -130,56 +139,45 @@ Tupla3f ObjRevolucion::calcularVectorRotado(int j, float factor_rotacion){
    return salida;
 }
 
-void ObjRevolucion::anadirTapas(bool inferior, bool superior){
-   int a = 0, b = 0;
-   auto it = f.begin() + (int)tabla_c.size();
+void ObjRevolucion::anadirTapas(){
+   int a = 0, b = 0, c;
 
    // tapa inferior
 
-   if(inferior){
+   if(tiene_tapas.first){
+      c = M*N;
       for (int i = 0; i < N; i++){
          a = M*i;
-         b = M*((i + 1)%N);
-         f.insert(it + i, {a, M*N, b});
+         b = (a + M)%(M*N);
+         f.push_back({a, c, b});
       }
-      tapas.first = true;
    }
 
    // tapa superior
-   if(superior){
+
+   if(tiene_tapas.second){
+      c = M*N + 1;
       for (int i = 0; i < N; i++){
          a = M*(i + 1) - 1;
          b = (a + M)%(M*N);
-         f.push_back({b, M*N + 1, a});
+         f.push_back({b, c, a});
       }
-      tapas.second = true;
    }
+
+   tapas = true;
 
    rellenar_v_ajedrez();
    rellenar_v_colores();
 }
 
-void ObjRevolucion::eliminarTapas(bool inferior, bool superior){
-   int a = 0, b = 0;
+void ObjRevolucion::eliminarTapas(){
+   int a = 0, b = 0,
+   iteraciones = (tiene_tapas.first? N : 0) + (tiene_tapas.second? N : 0);
 
-   // tapa inferior
-   // si queremos eliminar la inferior y esta en la tabla
-   // la eliminamos
+   for (int i = 0; i < iteraciones; i++)
+      f.pop_back();
 
-   if(inferior && tapas.first){
-      auto it = f.begin() + tabla_c.size();
-      f.erase(it, it + N);
-      tapas.first = false;
-   }
-
-   // tapa superior
-
-   if(superior && tapas.second){
-      for (int i = 0; i < N; i++)
-         f.pop_back();
-      
-      tapas.second = false;
-   }
+   tapas = false;
 
    rellenar_v_ajedrez();
    rellenar_v_colores();
@@ -206,20 +204,11 @@ void ObjRevolucion::crearPerfilDebug(){
    rellenar_v_colores();
 }
 
-void ObjRevolucion::toggleTapas(bool inferior, bool superior){
-   if(inferior){
-      if(tapas.first)
-         eliminarTapas(true, false);
-      else
-         anadirTapas(true, false);
-   }
-
-   if(superior){
-      if(tapas.second)
-         eliminarTapas(false, true);
-      else
-         anadirTapas(false, true);
-   }
+void ObjRevolucion::toggleTapas(){
+   if(tapas)
+      eliminarTapas();
+   else
+      anadirTapas();
 
    rellenar_v_ajedrez();
    elimina_vbo();
@@ -258,7 +247,7 @@ std::pair<bool,bool> ObjRevolucion::crearPolos(){
       polo_i(eje_nulo) = 0;
       polo_i(eje_nulo_2) = 0;
    }
-   else
+   else if(tiene_tapas.first)
       perfil.erase(perfil.begin());
    
 
@@ -266,7 +255,7 @@ std::pair<bool,bool> ObjRevolucion::crearPolos(){
       polo_s(eje_nulo) = 0;
       polo_s(eje_nulo_2) = 0;
    }
-   else
+   else if(tiene_tapas.second)
       perfil.pop_back();
 
    return(los_tiene);

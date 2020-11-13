@@ -1,14 +1,20 @@
 #include "esfera.h"
 
 Esfera::Esfera(const int num_vert_perfil, const int num_instancias_perf, const float radio, 
-EnumEjes eje_r, bool tapa_inf, bool tapa_sup){
+EnumEjes eje_r, bool con_tapas){
     perfil.clear();
     this->radio = radio;
-    tapas.first = tapa_inf;
-    tapas.second = tapa_sup;
     eje_rotacion = eje_r;
+    tiene_tapas.first = true;
+    tiene_tapas.second = true;
+
+    int vert_perfil = num_vert_perfil;
+    if(vert_perfil < 3) vert_perfil = 3;
+    int instancias_perf = num_instancias_perf;
+    if(instancias_perf < 2) instancias_perf = 2;
+
     float f_rotacion = 0;
-    int num_vert_con_polos = num_vert_perfil + 2;
+    int num_vert_con_polos = vert_perfil + 2;
     Tupla3f polo_s, polo_i;
 
     if(eje_r == EnumEjes::E_X){
@@ -24,17 +30,17 @@ EnumEjes eje_r, bool tapa_inf, bool tapa_sup){
         polo_s = {0.0, 0.0, radio};
     }
 
-    if(tapas.first) perfil.push_back(polo_i);
+    perfil.push_back(polo_i);
 
     for(int i = 1; i < num_vert_con_polos - 1; i++){
             f_rotacion = (M_PI*i)/(num_vert_con_polos-1);
             perfil.push_back(calcularPuntoPerfilRotado(f_rotacion, polo_i));
     }
 
-    if(tapas.second) perfil.push_back(polo_s);
+    perfil.push_back(polo_s);
 
     //crearPerfilDebug();
-    crearMalla(perfil, num_instancias_perf, (tapas.first && tapas.second));
+    crearMalla(perfil, num_instancias_perf, con_tapas);
 }
 
 Tupla3f Esfera::calcularPuntoPerfilRotado(float factor_rotacion, Tupla3f polo){
