@@ -10,8 +10,10 @@
 #include "cono.h"
 #include "cilindro.h"
 #include "esfera.h"
+#include "luzdireccional.h"
+#include "luzposicional.h"
 
-typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO} menu;
+typedef enum {NADA, SELOBJETO, SELVISUALIZACION, SELDIBUJADO, SELILUMINACION, VARALPHA, VARBETA} menu;
 
 class Escena
 {
@@ -23,7 +25,7 @@ class Escena
     enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, REVO = 6, NULO};
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
-    bool debug = false;
+    bool debug = true;
 
     //Funciones
     
@@ -31,6 +33,7 @@ class Escena
     void cambiar_visualizacion(ModoVisualizacion modo);
     void cambiaTapas();
     void ajustar_objeto(int i);
+    GLenum toggle_sombreado();
 
  // ** PARÁMETROS DE LA CÁMARA (PROVISIONAL)
        
@@ -60,6 +63,7 @@ class Escena
    Cilindro * cilindro = nullptr;
    Esfera * esfera = nullptr;
    ObjRevolucion * objrevo = nullptr;
+   std::vector<Luz *> luces;
 
    // Posiciones
    std::vector<Tupla3f> pos_objetos;

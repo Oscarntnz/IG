@@ -7,6 +7,7 @@
 // -- includes de OpenGL/glut/glu/glew (dependen del S.O.)
 // -- includes de la librería estándard de C++
 // -- includes de 'tuplasg.h'
+// -- enum de ejes
 //
 // #############################################################################
 
@@ -37,6 +38,8 @@
 #endif
 
 #include "tuplasg.h" // tipos: Tupla3f, Tupla2f, Tupla3d, etc.........
+
+enum EnumEjes : unsigned int {E_X = 0, E_Y = 1, E_Z = 2};
 
 
 #endif // AUX_H_INCLUDED

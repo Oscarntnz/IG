@@ -30,13 +30,7 @@ Tetraedro::Tetraedro(float lado)
    f.push_back({0,1,2}); f.push_back({0,2,3}); f.push_back({0,3,1});
    f.push_back({2,1,3});
 
-   // Inicializacion de las tablas para el modo ajedrez
-
-   rellenar_v_ajedrez();
-
-   // Inicializacion de los vectores de colores
-
-   rellenar_v_colores();
+   rellenar_vectores();
 
 }
 

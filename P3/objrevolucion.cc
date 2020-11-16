@@ -106,10 +106,7 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
    if(conTapas)
       anadirTapas();
    else
-   {
-      rellenar_v_ajedrez();
-      rellenar_v_colores();
-   }
+      rellenar_vectores();
    
 }
 
@@ -173,8 +170,7 @@ void ObjRevolucion::anadirTapas(){
 
    tapas = true;
 
-   rellenar_v_ajedrez();
-   rellenar_v_colores();
+   rellenar_vectores();
 }
 
 void ObjRevolucion::eliminarTapas(){
@@ -186,8 +182,7 @@ void ObjRevolucion::eliminarTapas(){
 
    tapas = false;
 
-   rellenar_v_ajedrez();
-   rellenar_v_colores();
+   rellenar_vectores();
 }
 
 void ObjRevolucion::crearPerfilDebug(){

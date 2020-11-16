@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include "aux.h"
 
 class MenuCtl
 {
@@ -18,5 +19,9 @@ class MenuCtl
         void modoDibujado(std::string modo);
         void cambiado(std::string loCambiado);
         void noValido();
+        void modoIluminacion();
+        void cambiarAngulo(std::string angulo);
+        void activadaLuz(bool activada, unsigned int i);
+        void cambiadoSombreado(GLenum sombreado);
 };
 #endif

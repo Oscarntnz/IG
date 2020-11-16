@@ -11,6 +11,7 @@
 #define MALLA3D_H_INCLUDED
 
 #include "aux.h"
+#include "material.h"
 
 // *****************************************************************************
 //
@@ -19,7 +20,7 @@
 // *****************************************************************************
 
 enum ModoDibujado{INMEDIATO, DIFERIDO, NINGUNO};
-enum ModoVisualizacion : unsigned int {PUNTOS = 0, LINEAS = 1, SOLIDO = 2, AJEDREZ = 3};
+enum ModoVisualizacion : unsigned int {PUNTOS = 0, LINEAS = 1, SOLIDO = 2, AJEDREZ = 3, ILUMINACION = 4};
 enum TipoMalla{ESTANDAR, OBJREVO, OBJPLY};
 
 class Malla3D
@@ -59,10 +60,33 @@ class Malla3D
    void mover(Tupla3f vector_despl);      //Mueve los vertices sumando los componentes del parametro
    void escalar(float factor);
 
+   inline void setMaterial(Material mat){
+      m = mat;
+   }
+
+   inline GLenum toggleShadeMode(){
+      if(sMode == GL_SMOOTH)
+         sMode = GL_FLAT;
+      else
+         sMode = GL_SMOOTH;
+
+      return sMode;
+   }
+
    private:
+
+   // funciones privadas
+
+   GLuint CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid * puntero_ram);
+   void dibuja(const std::vector<Tupla3i> & vect);
+   void dibuja_dif(const std::vector<Tupla3i> & vect, GLuint id);
+   void reserva_espacio(); // reserva espacio en todos los vectores una vez ya tenemos v y f
+   void calculaTablaNormales();
 
    // atributos privados
 
+   Material m;
+   GLenum sMode = GL_FLAT;       // modo de sombreado
    const int N_VBO = 9;
    GLuint id_vbo_ver = 0,        // id de VBO de vertices
    id_vbo_tri = 0,               // id de VBO de triangulos
@@ -72,26 +96,20 @@ class Malla3D
    id_vbo_pun = 0,               // id de VBO de color de puntos
    id_vbo_lin = 0,               // id de VBO de color de lineas
    id_vbo_ca1 = 0,               // id de VBO de color de ajedrez 1
-   id_vbo_ca2 = 0;               // id de VBO de color de ajedrez 2
+   id_vbo_ca2 = 0,               // id de VBO de color de ajedrez 2
+   id_vbo_nv = 0;                // id de VBO del vector de normales
 
    bool visible = true;         // bool para hacer visible o invisible la malla
    ModoDibujado modo_dibujo = ModoDibujado::INMEDIATO; // modo de dibjudado de la malla
-   static const unsigned int N_MODOS_V = 4;             // nº de modos de visualizacion
-   bool modos_visualizacion[N_MODOS_V] = {false, false, true, false}; // vector de bool para saber el tipo de visualizacion
-
-   // funciones privadas
-
-   GLuint CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid * puntero_ram);
-   void dibuja(std::vector<Tupla3i> v);
-   void dibuja_dif(std::vector<Tupla3i> v, GLuint id);
+   static const unsigned int N_MODOS_V = 5;             // nº de modos de visualizacion
+   bool modos_visualizacion[N_MODOS_V] = {false, false, true, false, false}; // vector de bool para saber el tipo de visualizacion
 
    protected:
 
    void calcular_normales() ;       // calcula tabla de normales de vértices (práctica 3)
    void rellenar_v_colores();       // rellena el vector de colores
    void rellenar_v_ajedrez();       // rellena el vector de caras del modo ajedrez
-   void reserva_espacio(unsigned int vertices, unsigned int caras);  // reserva espacio en todos los vectores
-   void reserva_espacio(); // reserva espacio en todos los vectores una vez ya tenemos v y f
+   void rellenar_vectores();
    void elimina_vbo();
 
 
@@ -102,6 +120,9 @@ class Malla3D
    std::vector<Tupla3i> f;          // una terna de 3 enteros por cada cara o triángulo
    std::vector<Tupla3i> a;          // una terna de 3 enteros por la mitad de las caras o triángulos del modo ajedrez
    std::vector<Tupla3i> a_2;        // una terna de 3 enteros por la otra mitad de las caras o triángulos del modo ajedrez
+
+   // vectores de normales
+   std::vector<Tupla3f> nv;
 
    // vectores de colores
    std::vector<Tupla3f> c_i;        // tabla de colores para modo inmediato

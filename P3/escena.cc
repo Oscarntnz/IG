@@ -13,7 +13,7 @@
 // constructor de la escena (no puede usar ordenes de OpenGL)
 //**************************************************************************
 
-Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
+Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
 {
    Front_plane       = 50.0;
    Back_plane        = 2000.0;
@@ -65,6 +65,12 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
          pos_objetos[i] = {0.0, 0.0, 0.0};
       }
    }
+
+   luces.push_back(new LuzPosicional({0.0,0.0,0.0}, GL_LIGHT0, {1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0},
+   {0.0, 0.0, 1.0, 1.0}));
+   luces.push_back(new LuzDireccional({Observer_angle_x,Observer_angle_y}, GL_LIGHT1,
+   {1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0},
+   {0.0, 0.0, 1.0, 1.0}));
 }
 
 //**************************************************************************
@@ -84,6 +90,9 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
 
    if(!debug)
       glEnable(GL_CULL_FACE);
+
+   glEnable(GL_NORMALIZE);
+   glEnable(GL_COLOR_MATERIAL);
 
 	Width  = UI_window_width/10;
 	Height = UI_window_height/10;
@@ -109,6 +118,7 @@ void Escena::dibujar()
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Limpiar la pantalla
 	change_observer();
    ejes.draw();
+   glDisable(GL_LIGHTING);
 
     //   Dibujar los diferentes elementos de la escena
 
@@ -140,8 +150,14 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
    switch( toupper(tecla) )
    {
       case 'Q' :
-         if (modoMenu!=NADA)
-            modoMenu=NADA;            
+         if(modoMenu == VARALPHA || modoMenu == VARBETA){
+            modoMenu = SELILUMINACION;
+            menu_ctl.modoIluminacion();
+         }
+         else if(modoMenu!=NADA){
+            modoMenu=NADA;
+            menu_ctl.menuPrincipal();
+         }
          else {
             salir=true ;
          }
@@ -334,6 +350,10 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.cambiado("solido");
             modoMenu=NADA;
          }
+         // ESTAMOS CAMBIANDO LA FORMA DE SOMBREADO
+         else if(modoMenu==SELILUMINACION){
+            menu_ctl.cambiadoSombreado(toggle_sombreado());
+         }
          else
             menu_ctl.noValido();
          
@@ -346,10 +366,37 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.cambiado("ajedrez");
             modoMenu=NADA;
          }
+         else if(modoMenu==SELILUMINACION || modoMenu == VARBETA){
+            modoMenu = VARALPHA;
+            menu_ctl.cambiarAngulo("alpha");
+         }
          else
             menu_ctl.noValido();
          
          break;
+
+      case 'B':
+         if(modoMenu==SELILUMINACION || modoMenu == VARALPHA){
+            modoMenu = VARBETA;
+            menu_ctl.cambiarAngulo("beta");
+         }
+         else
+            menu_ctl.noValido();
+         
+         break;
+
+      case 'I' :
+      // ESTAMOS SELECCIONANDO MODO DE VISUALIZACION ILUMINACION
+      if (modoMenu==SELVISUALIZACION){
+         cambiar_visualizacion(ModoVisualizacion::ILUMINACION);
+         menu_ctl.cambiado("iluminacion");
+         menu_ctl.modoIluminacion();
+         modoMenu = SELILUMINACION;
+      }
+      else
+         menu_ctl.noValido();
+      
+      break;
 
       case 'D' :
          // ESTAMOS EN MODO SELECCION DE DIBUJADO
@@ -362,14 +409,27 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
 
          break;
       
-      // OPCIONES DE SELECCION DE DIBUJADO
-      
+      case '0':
+      // ESTAMOS SELECCIONANDO LA LUZ POSICIONAL
+         if (modoMenu==SELILUMINACION){
+            luces[0]->activar();
+            menu_ctl.activadaLuz(luces[0]->getActivada(), 0);
+         }
+         else
+            menu_ctl.noValido();
+      break;
+
       case '1' :
          // ESTAMOS SELECCIONANDO MODO DE DIBUJADO INMEDIATO
          if (modoMenu==SELDIBUJADO){
             cambiar_dibujado(ModoDibujado::INMEDIATO);
             menu_ctl.modoDibujado("inmediato");
             modoMenu=NADA;
+         }
+         // ESTAMOS SELECCIONANDO LA LUZ DIRECCIONAL
+         else if (modoMenu==SELILUMINACION){
+            luces[1]->activar();
+            menu_ctl.activadaLuz(luces[1]->getActivada(),1);
          }
          else
             menu_ctl.noValido();
@@ -386,6 +446,33 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
             menu_ctl.noValido();
          
          break;
+
+         case '<':
+            // ESTAMOS VARIANDO EL ANGULO ALPHA
+         if (modoMenu==VARALPHA){
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(-5.0);
+         }
+         // ESTAMOS VARIANDO EL ANGULO BETA
+         else if (modoMenu==VARBETA){
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(-5.0);
+         }
+         else
+            menu_ctl.noValido();
+         break;
+
+         case '>':
+            // ESTAMOS VARIANDO EL ANGULO ALPHA
+         if (modoMenu==VARALPHA){
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(5.0);
+         }
+         // ESTAMOS VARIANDO EL ANGULO BETA
+         else if (modoMenu==VARBETA){
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(5.0);
+         }
+         else
+            menu_ctl.noValido();
+         break;
+
       default:
          menu_ctl.noValido();
    }
@@ -485,4 +572,12 @@ void Escena::cambiaTapas(){
 
 void Escena::ajustar_objeto(int i){
    glTranslatef(pos_objetos[i](EnumEjes::E_X),pos_objetos[i](EnumEjes::E_Y),pos_objetos[i](EnumEjes::E_Z));
+}
+
+GLenum Escena::toggle_sombreado(){
+   GLenum sombreado;
+   for(auto it = objetos_escena.begin(); it != objetos_escena.end(); ++it)
+      sombreado = (*it)->toggleShadeMode();
+
+   return sombreado;
 }

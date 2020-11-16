@@ -37,9 +37,9 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0)
    cubo = new Cubo(25);
    tetraedro = new Tetraedro(25);
    objply = new ObjPLY("./plys/krillin", 7.5);
-   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_Y, false);
+   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_X, false);
    cono = new Cono(2, 25, 25, 12.5, EnumEjes::E_Y, true);
-   esfera = new Esfera(10, 25, 12.5, EnumEjes::E_Y, true);
+   esfera = new Esfera(10, 25, 12.5, EnumEjes::E_Z, true);
    objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
 
    objetos_escena.push_back(cubo);

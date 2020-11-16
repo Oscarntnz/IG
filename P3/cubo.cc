@@ -25,10 +25,6 @@ Cubo::Cubo(float lado)
    //Superior
    f.push_back({5,0,3}); f.push_back({5,3,4});
 
-   rellenar_v_ajedrez();
-
-   //Inicializacion de los vectores de colores
-
-   rellenar_v_colores();
+   rellenar_vectores();
 }
 

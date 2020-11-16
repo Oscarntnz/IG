@@ -32,6 +32,7 @@ void MenuCtl::selVisualizacion(){
     std::cout << "\tP: Modo puntos" << std::endl;
     std::cout << "\tL: Modo lineas" << std::endl;
     std::cout << "\tA: Modo ajedrez" << std::endl;
+    std::cout << "\tI: Modo iluminacion" << std::endl;
 }
 
 void MenuCtl::selDibujado(){
@@ -54,4 +55,27 @@ void MenuCtl::cambiado(std::string loCambiado){
 
 void MenuCtl::noValido(){
     std::cout << "Opcion no valida" << std::endl;
+}
+
+void MenuCtl::modoIluminacion(){
+    std::cout << "Modo seleccion de iluminacion:" << std::endl;
+    std::cout << "\t0: Cambiar Luz Posicional" << std::endl;
+    std::cout << "\t1: Cambiar Luz Direccional" << std::endl;
+    std::cout << "\tA: Variar Angulo Alpha" << std::endl;
+    std::cout << "\tB: Variar Angulo Beta" << std::endl;
+    std::cout << "\tS: Cambiar modo sombreado" << std::endl;
+}
+
+void MenuCtl::cambiarAngulo(std::string angulo){
+    std::cout << "Modo variacion de angulo " << angulo << ":" << std::endl;
+    std::cout << "\t>: Incrementar angulo" << std::endl;
+    std::cout << "\t<: Decrementar angulo" << std::endl;
+}
+
+void MenuCtl::activadaLuz(bool activada, unsigned int i){
+    std::cout << "\t" << (activada? "Activada" : "Desactivada") << " luz " << i << std::endl;
+}
+
+void MenuCtl::cambiadoSombreado(GLenum sombreado){
+    std::cout << "\tModo sombreado " << (sombreado == GL_SMOOTH? "suave" : "plano") << std::endl;
 }

@@ -23,8 +23,6 @@
 // Cubo con centro en el origen y lado unidad por defecto
 // (tiene 9 vertices y 6 caras)
 
-enum EnumEjes : unsigned int {E_X = 0, E_Y = 1, E_Z = 2};
-
 class ObjRevolucion : public Malla3D
 {
     public:

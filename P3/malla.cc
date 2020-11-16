@@ -18,6 +18,7 @@ Malla3D::~Malla3D(){
    c_l.clear();
    c_a.clear();
    c_a_2.clear();
+   nv.clear();
 }
 
 // Visualización en modo inmediato con 'glDrawElements'
@@ -30,10 +31,12 @@ void Malla3D::draw_ModoInmediato()
    // habilitar uso de un array de vértices y de colores
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnableClientState(GL_COLOR_ARRAY);
+   glEnableClientState(GL_NORMAL_ARRAY);
 
    // indicar el formato y la dirección de memoria del array de vértices
    // (son tuplas de 3 valores float, sin espacio entre ellas)
    glVertexPointer(3, GL_FLOAT, 0, v.data());
+
    glColorPointer(3, GL_FLOAT, 0, c_i.data());
 
    glPointSize(5.0);
@@ -62,10 +65,18 @@ void Malla3D::draw_ModoInmediato()
       glColorPointer(3, GL_FLOAT, 0, c_a_2.data());
       dibuja(a_2);
    }
+   if(modos_visualizacion[ModoVisualizacion::ILUMINACION]){
+      glEnable(GL_LIGHTING);
+      glNormalPointer(GL_FLOAT, 0, nv.data());
+      m.aplicar();
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      dibuja(f);
+   }
    
    // deshabilitar array de vértices
    glDisableClientState(GL_VERTEX_ARRAY);
    glDisableClientState(GL_COLOR_ARRAY);
+   glDisableClientState(GL_NORMAL_ARRAY);
 }
 // -----------------------------------------------------------------------------
 // Visualización en modo diferido con 'glDrawElements' (usando VBOs)
@@ -90,15 +101,21 @@ void Malla3D::draw_ModoDiferido()
       id_vbo_ca1 = CrearVBO(GL_ARRAY_BUFFER, c_a.size()*sizeof(Tupla3f), c_a.data());
    if(id_vbo_ca2 == 0)
       id_vbo_ca2 = CrearVBO(GL_ARRAY_BUFFER, c_a_2.size()*sizeof(Tupla3f), c_a_2.data());
+   if(id_vbo_nv == 0)
+      id_vbo_nv = CrearVBO(GL_ARRAY_BUFFER, nv.size()*sizeof(Tupla3f), nv.data());
 
    // especificar localización y formato de la tabla de vértices, habilitar tabla
+   
+   glEnableClientState(GL_VERTEX_ARRAY);        // habilitar tabla de vértices
+   glEnableClientState(GL_COLOR_ARRAY);        // activar tabla de colores
+   glEnableClientState(GL_NORMAL_ARRAY);        // activar tabla de normales
 
    glBindBuffer(GL_ARRAY_BUFFER, id_vbo_ver);   // activar VBO de vértices
    glVertexPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
    glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de vértices.
-   glEnableClientState(GL_VERTEX_ARRAY);        // habilitar tabla de vértices
 
-   glPointSize(5.0);
+
+   glPointSize(5.0);                            // tamaño de puntos
 
    // especificar localización y formato de la tabla de colores, habilitar tabla
 
@@ -106,7 +123,6 @@ void Malla3D::draw_ModoDiferido()
       glBindBuffer(GL_ARRAY_BUFFER, id_vbo_col);   // activar VBO de colores
       glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
       glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de colores.
-      glEnableClientState(GL_COLOR_ARRAY);        // activar tabla de colores
 
       // visualizar triángulos con glDrawElements (puntero a tabla == 0)
 
@@ -114,11 +130,9 @@ void Malla3D::draw_ModoDiferido()
       dibuja_dif(f, id_vbo_tri);
    }
    if(modos_visualizacion[ModoVisualizacion::PUNTOS]){
-
       glBindBuffer(GL_ARRAY_BUFFER, id_vbo_pun);   // activar VBO de colores
       glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
       glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de colores.
-      glEnableClientState(GL_COLOR_ARRAY);        // activar tabla de colores
 
       // visualizar triángulos con glDrawElements (puntero a tabla == 0)
 
@@ -129,7 +143,6 @@ void Malla3D::draw_ModoDiferido()
       glBindBuffer(GL_ARRAY_BUFFER, id_vbo_lin);   // activar VBO de colores
       glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
       glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de colores.
-      glEnableClientState(GL_COLOR_ARRAY);        // activar tabla de colores
 
       // visualizar triángulos con glDrawElements (puntero a tabla == 0)
 
@@ -141,12 +154,11 @@ void Malla3D::draw_ModoDiferido()
       glBindBuffer(GL_ARRAY_BUFFER, id_vbo_ca1);   // activar VBO de colores
       glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
       glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de colores.
-      glEnableClientState(GL_COLOR_ARRAY);        // activar tabla de colores
 
       // visualizar triángulos con glDrawElements (puntero a tabla == 0)
 
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      dibuja_dif(f, id_vbo_aj1);
+      dibuja_dif(a, id_vbo_aj1);
 
       glBindBuffer(GL_ARRAY_BUFFER, id_vbo_ca2);   // activar VBO de colores
       glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
@@ -154,12 +166,28 @@ void Malla3D::draw_ModoDiferido()
 
       // visualizar triángulos con glDrawElements (puntero a tabla == 0)
 
-      dibuja_dif(f, id_vbo_aj2);
+      dibuja_dif(a_2, id_vbo_aj2);
+   }
+
+   if(modos_visualizacion[ModoVisualizacion::ILUMINACION]){
+      glEnable(GL_LIGHTING);
+      glBindBuffer(GL_ARRAY_BUFFER, id_vbo_nv);   // activar VBO de normales
+      glNormalPointer(GL_FLOAT, 0, 0);
+      glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de normales.
+      m.aplicar();
+      
+      glBindBuffer(GL_ARRAY_BUFFER, id_vbo_col);   // activar VBO de colores
+      glColorPointer(3, GL_FLOAT, 0, 0);          // especifica formato y offset (=0)
+      glBindBuffer(GL_ARRAY_BUFFER , 0);          // desactivar VBO de colores.
+
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      dibuja_dif(f, id_vbo_tri);
    }
 
    // desactivar uso de array de vértices
    glDisableClientState(GL_VERTEX_ARRAY);
    glDisableClientState(GL_COLOR_ARRAY);
+   glDisableClientState(GL_NORMAL_ARRAY);
 }
 // -----------------------------------------------------------------------------
 // Función de visualización de la malla,
@@ -167,12 +195,15 @@ void Malla3D::draw_ModoDiferido()
 
 void Malla3D::draw()
 {
+   glShadeModel(sMode);       // activamos el sombreado plano o suavizado
+
    if(visible){
       if(modo_dibujo == ModoDibujado::INMEDIATO)
          draw_ModoInmediato();
       else if(modo_dibujo == ModoDibujado::DIFERIDO)
          draw_ModoDiferido();
    }
+   
 }
 
 GLuint Malla3D::CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid * puntero_ram)
@@ -189,27 +220,45 @@ GLuint Malla3D::CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid * puntero
    return id_vbo ;                  // devolver el identificador resultado
 }
 
-void Malla3D::dibuja(std::vector<Tupla3i> v){
-   glDrawElements(GL_TRIANGLES, v.size()*3, GL_UNSIGNED_INT, v.data());
+void Malla3D::dibuja(const std::vector<Tupla3i>& vect){
+   glDrawElements(GL_TRIANGLES, vect.size()*3, GL_UNSIGNED_INT, vect.data());
 }
 
-void Malla3D::dibuja_dif(std::vector<Tupla3i> v, GLuint id){
+void Malla3D::dibuja_dif(const std::vector<Tupla3i> &vect, GLuint id){
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);    // activar VBO de triángulos
-   glDrawElements(GL_TRIANGLES, 3*f.size (), GL_UNSIGNED_INT, 0);
+   glDrawElements(GL_TRIANGLES, vect.size()*3, GL_UNSIGNED_INT, 0);
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER , 0);    
 }
 
 void Malla3D::cambiar_visualizacion(ModoVisualizacion modo){
-      if(modo != ModoVisualizacion::AJEDREZ){
-         modos_visualizacion[ModoVisualizacion::AJEDREZ] = false;
-         modos_visualizacion[modo] = !modos_visualizacion[modo];
-      }
-      else{
-         modos_visualizacion[ModoVisualizacion::PUNTOS] = false;
-         modos_visualizacion[ModoVisualizacion::LINEAS] = false;
-         modos_visualizacion[ModoVisualizacion::SOLIDO] = false;
-         modos_visualizacion[modo] = !modos_visualizacion[modo];
-      }
+
+   // Si el modo de dibujado no es ajedrez ni iluminacion
+
+   if(modo != ModoVisualizacion::AJEDREZ && modo != ModoVisualizacion::ILUMINACION){
+      modos_visualizacion[ModoVisualizacion::AJEDREZ] = false;
+      modos_visualizacion[ModoVisualizacion::ILUMINACION] = false;
+      modos_visualizacion[modo] = !modos_visualizacion[modo];
+   }
+   else if(modo == ModoVisualizacion::AJEDREZ){
+      modos_visualizacion[ModoVisualizacion::PUNTOS] = false;
+      modos_visualizacion[ModoVisualizacion::LINEAS] = false;
+      modos_visualizacion[ModoVisualizacion::SOLIDO] = false;
+      modos_visualizacion[ModoVisualizacion::ILUMINACION] = false;
+      modos_visualizacion[modo] = !modos_visualizacion[modo];
+   }
+   else
+   {
+      modos_visualizacion[ModoVisualizacion::PUNTOS] = false;
+      modos_visualizacion[ModoVisualizacion::LINEAS] = false;
+      modos_visualizacion[ModoVisualizacion::SOLIDO] = false;
+      modos_visualizacion[ModoVisualizacion::AJEDREZ] = false;
+
+      if(modos_visualizacion[modo])
+         modos_visualizacion[ModoVisualizacion::SOLIDO] = true;
+         
+      modos_visualizacion[modo] = !modos_visualizacion[modo];
+   }
+   
 }
 
 void Malla3D::mover(Tupla3f vector_despl){
@@ -277,4 +326,44 @@ void Malla3D::elimina_vbo(){
       id_vbo_ca1 = 0,               // id de VBO de color de ajedrez 1
       id_vbo_ca2 = 0;               // id de VBO de color de ajedrez 2
    }
+}
+
+void Malla3D::calcular_normales(){
+   nv.clear();
+   nv.resize(v.size());
+   Tupla3f cero = {0.0, 0.0, 0.0};
+   std::fill(nv.begin(), nv.end(), cero);
+   Tupla3f a, b, mc, nc, mv;
+
+   for(auto it = f.begin(); it != f.end(); ++it){
+      a = v[(*it)(1)] - v[(*it)(0)];
+      b = v[(*it)(2)] - v[(*it)(0)];
+      mc = a.cross(b);
+
+      if(mc.lengthSq() > 0.0)  nc = mc.normalized();
+      else  nc = {0.0, 0.0, 0.0};
+      
+
+      nv[(*it)(0)] = nv[(*it)(0)] + nc;
+      nv[(*it)(1)] = nv[(*it)(2)] + nc;
+      nv[(*it)(2)] = nv[(*it)(2)] + nc;
+   }
+
+   for(auto it = nv.begin(); it != nv.end(); ++it)
+      if ((*it).lengthSq() > 0)
+         *it = it->normalized();
+}
+
+void Malla3D::rellenar_vectores(){
+   // Inicializacion de las tablas para el modo ajedrez
+
+   rellenar_v_ajedrez();
+
+   // Inicializacion de los vectores de colores
+
+   rellenar_v_colores();
+
+   // calcula los vectores normales de las caras
+
+   calcular_normales();
 }
