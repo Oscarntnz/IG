@@ -21,7 +21,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
    Observer_angle_x  = 0.0 ;
    Observer_angle_y  = 0.0 ;
    objeto_a_dibujar = Objetos::NULO;
-   srand(time(nullptr));
+   srand(time(NULL));
 
    ejes.changeAxisSize(5000);
 
@@ -38,11 +38,11 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
    cubo = new Cubo(2.5);
    tetraedro = new Tetraedro(2.5);
    objply = new ObjPLY("./plys/krillin");
-   cilindro = new Cilindro(20, 50, 5, 2.5, EnumEjes::E_Y, true);
-   cono = new Cono(4, 100, 5, 2.5, EnumEjes::E_Z, true);
-   esfera = new Esfera(100, 100, 2, EnumEjes::E_X, true);
-   objrevo = new ObjRevolucion("./plys/peon", 100, EnumEjes::E_Y, true, true, true);
-   objrevo2 = new ObjRevolucion("./plys/peon", 100, EnumEjes::E_Y, true, true, true);
+   cilindro = new Cilindro(20, 20, 5, 2.5, EnumEjes::E_Y, true);
+   cono = new Cono(4, 20, 5, 2.5, EnumEjes::E_Z, true);
+   esfera = new Esfera(20, 20, 2, EnumEjes::E_X, true);
+   objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
+   objrevo2 = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
    //objrevo = new ObjRevolucion(perfil_ejemplo, 20, EnumEjes::E_Y, true, true, true);
 
    // Peones
@@ -114,7 +114,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
    }
 
    luces.push_back(new LuzPosicional({200.0, 0.0, 0.0}, GL_LIGHT0,
-   {0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}));
+   {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 1.0}));
    luces.push_back(new LuzDireccional({M_PI,M_PI}, GL_LIGHT1,
    {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}));
 }
@@ -125,7 +125,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
 // Principalmemnte, inicializa OpenGL y la transf. de vista y proyección
 //**************************************************************************
 
-void Escena::inicializar( int UI_window_width, int UI_window_height )
+void Escena::inicializar(int UI_window_width, int UI_window_height)
 {
    if(!debug)
 	   glClearColor(1.0, 1.0, 1.0, 1.0);       // se indica cual sera el color para limpiar la ventana	(r,v,a,al)
@@ -137,7 +137,6 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
    if(!debug)  glEnable(GL_CULL_FACE);
 
    glEnable(GL_NORMALIZE);
-   glEnable(GL_COLOR_MATERIAL);
 
 	Width  = UI_window_width/10;
 	Height = UI_window_height/10;
@@ -185,7 +184,7 @@ void Escena::dibujar()
 //
 //**************************************************************************
 
-bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
+bool Escena::teclaPulsada(unsigned char tecla, int x, int y)
 {
    using namespace std ;
    cout << "Tecla pulsada: '" << tecla << "'" << endl;

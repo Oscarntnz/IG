@@ -24,7 +24,7 @@ void Material::aplicar(){
 
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glColorMaterial(GL_FRONT_AND_BACK, GL_SPECULAR);
-
+    
     glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHTING);
 }

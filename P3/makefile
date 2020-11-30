@@ -48,3 +48,6 @@ $(units_cc) : $(headers)
 
 clean:
 	rm -f *.o *_exe
+
+entrega: clean
+	zip -r entrega . -x ".vscode/*"

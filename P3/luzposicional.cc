@@ -5,7 +5,7 @@ Tupla4f colorDifuso){
     this->id = idLuzOpenGL;
     this->colorAmbiente = colorAmbiente;
     this->colorEspecular = colorEspecular;
-    this->colorAmbiente = colorAmbiente;
+    this->colorDifuso = colorDifuso;
 
     this->posicion = {posicion(EnumEjes::E_X), posicion(EnumEjes::E_Y), posicion(EnumEjes::E_Z), 1.0};
 }

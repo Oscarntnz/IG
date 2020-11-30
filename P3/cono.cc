@@ -8,7 +8,7 @@ const float radio, EnumEjes eje_r, bool con_tapa){
     this->radio = radio;
     eje_rotacion = eje_r;
     tiene_tapas.first = true;
-    tiene_tapas.second = false;
+    tiene_tapas.second = true;
 
     int vert_perfil = num_vert_perfil;
     if(vert_perfil < 2) vert_perfil = 2;
