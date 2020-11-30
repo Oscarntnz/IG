@@ -13,7 +13,7 @@
 // constructor de la escena (no puede usar ordenes de OpenGL)
 //**************************************************************************
 
-Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
+Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escalas_objetos(0)
 {
    Front_plane       = 50.0;
    Back_plane        = 2000.0;
@@ -21,10 +21,9 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
    Observer_angle_x  = 0.0 ;
    Observer_angle_y  = 0.0 ;
    objeto_a_dibujar = Objetos::NULO;
+   srand(time(nullptr));
 
    ejes.changeAxisSize(5000);
-
-   // crear los objetos de la escena
 
    // perfil para probar el obj revo por perfil
 
@@ -34,13 +33,50 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
    perfil_ejemplo.push_back({10.0, 10.0, 0.0});
    perfil_ejemplo.push_back({0.0, 10.0, 0.0});
 
-   cubo = new Cubo(25);
-   tetraedro = new Tetraedro(25);
-   objply = new ObjPLY("./plys/krillin", 7.5);
-   cilindro = new Cilindro(2, 25, 25, 12.5, EnumEjes::E_Y, false);
-   cono = new Cono(2, 25, 25, 12.5, EnumEjes::E_Y, true);
-   esfera = new Esfera(10, 25, 12.5, EnumEjes::E_Y, true);
-   objrevo = new ObjRevolucion("./plys/peon", 20, EnumEjes::E_Y, true, true, true);
+   // crear los objetos de la escena
+
+   cubo = new Cubo(2.5);
+   tetraedro = new Tetraedro(2.5);
+   objply = new ObjPLY("./plys/krillin");
+   cilindro = new Cilindro(20, 50, 5, 2.5, EnumEjes::E_Y, true);
+   cono = new Cono(4, 100, 5, 2.5, EnumEjes::E_Z, true);
+   esfera = new Esfera(100, 100, 2, EnumEjes::E_X, true);
+   objrevo = new ObjRevolucion("./plys/peon", 100, EnumEjes::E_Y, true, true, true);
+   objrevo2 = new ObjRevolucion("./plys/peon", 100, EnumEjes::E_Y, true, true, true);
+   //objrevo = new ObjRevolucion(perfil_ejemplo, 20, EnumEjes::E_Y, true, true, true);
+
+   // Peones
+
+   objrevo->setColor({0.95,0.95,0.95},{0.95,0.95,0.95});
+   objrevo2->setColor({0.2,0.2,0.2},{0.2,0.2,0.2});
+
+   //Resto
+
+   cubo->setColor(randomColor(), randomColor());
+   tetraedro->setColor(randomColor(), randomColor());
+   objply->setColor(randomColor(), randomColor());
+   cilindro->setColor(randomColor(), randomColor());
+   cono->setColor(randomColor(), randomColor());
+   esfera->setColor(randomColor(), randomColor());
+
+   // emerald modificado
+
+   Tupla4f ambiente = {0.0215, 0.1745, 0.0215, 1.0},
+   difuso = {0.07568, 0.61424, 0.07568, 1.0},
+   especular = {0.0, 0.0, 0.0, 1.0};
+   float brillo = 0.01*128;
+   Material m(ambiente, difuso, especular, brillo);
+   objrevo->setMaterial(m);
+   objply->setMaterial(m);
+
+   // black plastic modificado
+
+   ambiente = {0.0, 0.0, 0.0, 1.0},
+   difuso = {0.01, 0.01, 0.01, 1.0},
+   especular = {0.50, 0.50, 0.50, 1.0};
+   brillo = 0.7*128;
+   Material m2(ambiente, difuso, especular, brillo);
+   objrevo2->setMaterial(m2);
 
    objetos_escena.push_back(cubo);
    objetos_escena.push_back(tetraedro);
@@ -49,28 +85,38 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
    objetos_escena.push_back(cono);
    objetos_escena.push_back(esfera);
    objetos_escena.push_back(objrevo);
+   objetos_escena.push_back(objrevo2);
 
-   pos_objetos.push_back({100.0, 0.0, 0.0});
-   pos_objetos.push_back({100.0, 100.0, 0.0});
-   pos_objetos.push_back({0.0, 0.0, 0.0});
-   pos_objetos.push_back({0.0, 0.0, 100.0});
-   pos_objetos.push_back({-100.0, 0.0, -100.0});
-   pos_objetos.push_back({-100.0, 0.0, 0.0});
-   pos_objetos.push_back({-100.0, 0.0, 100.0});
+   pos_objetos.push_back({10.0, 0.0, 0.0});
+   pos_objetos.push_back({10.0, 0.0, 5.0});
+   pos_objetos.push_back({-10.0, 0.0, -5.0});
+   pos_objetos.push_back({-10.0, 0.0, 10.0});
+   pos_objetos.push_back({10.0, 0.0, -10.0});
+   pos_objetos.push_back({-10.0, 0.0, 0.0});
+   pos_objetos.push_back({-1.25, 0.0, 0.0});
+   pos_objetos.push_back({1.25, 0.0, 0.0});
+   //pos_objetos.push_back({100.0, 0.0, 100.0});
+
+   escalas_objetos.push_back({10.0, 10.0, 10.0});
+   escalas_objetos.push_back({10.0, 10.0, 10.0});
+   escalas_objetos.push_back({10.0, 10.0, 10.0});
+   escalas_objetos.push_back({6.0, 6.0, 6.0});
+   escalas_objetos.push_back({10.0, 10.0, 10.0});
+   escalas_objetos.push_back({10.0, 10.0, 10.0});
+   escalas_objetos.push_back({20.0, 20.0, 20.0});
+   escalas_objetos.push_back({20.0, 20.0, 20.0});
 
    if(debug){
       for(int i = 0; i < objetos_escena.size(); ++i){
          objetos_escena[i]->toggle_visibility();
-         objetos_escena[i]->escalar(5.0);
          pos_objetos[i] = {0.0, 0.0, 0.0};
       }
    }
 
-   luces.push_back(new LuzPosicional({0.0,0.0,0.0}, GL_LIGHT0, {1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0},
-   {0.0, 0.0, 1.0, 1.0}));
-   luces.push_back(new LuzDireccional({Observer_angle_x,Observer_angle_y}, GL_LIGHT1,
-   {1.0, 0.0, 0.0, 1.0}, {0.0, 1.0, 0.0, 1.0},
-   {0.0, 0.0, 1.0, 1.0}));
+   luces.push_back(new LuzPosicional({200.0, 0.0, 0.0}, GL_LIGHT0,
+   {0.0f, 0.0f, 0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}));
+   luces.push_back(new LuzDireccional({M_PI,M_PI}, GL_LIGHT1,
+   {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}));
 }
 
 //**************************************************************************
@@ -82,14 +128,13 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0)
 void Escena::inicializar( int UI_window_width, int UI_window_height )
 {
    if(!debug)
-	   glClearColor( 1.0, 1.0, 1.0, 1.0 );// se indica cual sera el color para limpiar la ventana	(r,v,a,al)
+	   glClearColor(1.0, 1.0, 1.0, 1.0);       // se indica cual sera el color para limpiar la ventana	(r,v,a,al)
    else
-      glClearColor( 0.0, 0.05, 0.10, 1.0 );
+      glClearColor(0.0, 0.05, 0.10, 1.0);     // modo oscuro
 
-	glEnable( GL_DEPTH_TEST );	// se habilita el z-bufer
+	glEnable(GL_DEPTH_TEST);	// se habilita el z-bufer
 
-   if(!debug)
-      glEnable(GL_CULL_FACE);
+   if(!debug)  glEnable(GL_CULL_FACE);
 
    glEnable(GL_NORMALIZE);
    glEnable(GL_COLOR_MATERIAL);
@@ -97,8 +142,8 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
 	Width  = UI_window_width/10;
 	Height = UI_window_height/10;
 
-   change_projection( float(UI_window_width)/float(UI_window_height) );
-	glViewport( 0, 0, UI_window_width, UI_window_height );
+   change_projection(float(UI_window_width)/float(UI_window_height));
+	glViewport(0, 0, UI_window_width, UI_window_height);
 
    std::cout << std::endl << "Practica IG:" << std::endl << std::endl;
    menu_ctl.menuPrincipal();
@@ -115,23 +160,21 @@ void Escena::inicializar( int UI_window_width, int UI_window_height )
 
 void Escena::dibujar()
 {
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); // Limpiar la pantalla
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Limpiar la pantalla
 	change_observer();
-   ejes.draw();
    glDisable(GL_LIGHTING);
+   ejes.draw();
 
-    //   Dibujar los diferentes elementos de la escena
+   // Dibujar las distintas luces de la escena
 
-   //Antiguo
-   for(int i = 0; i < objetos_escena.size(); ++i){
-      if(objeto_a_dibujar == Objetos(i) || objetos_escena[i]->get_visibility()){
-         glPushMatrix();
-            ajustar_objeto(i);
-            objetos_escena[i]->draw();
-         glPopMatrix();
-      }
-   }
+   dibuja_luces();
+
+   // Dibujar los diferentes elementos de la escena
+
+   dibuja_objetos();
+
    objeto_a_dibujar == Objetos::NULO;
+
 }
 
 //**************************************************************************
@@ -386,8 +429,8 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          break;
 
       case 'I' :
-      // ESTAMOS SELECCIONANDO MODO DE VISUALIZACION ILUMINACION
-      if (modoMenu==SELVISUALIZACION){
+      // ESTAMOS SELECCIONANDO ILUMINACION
+      if (modoMenu==NADA){
          cambiar_visualizacion(ModoVisualizacion::ILUMINACION);
          menu_ctl.cambiado("iluminacion");
          menu_ctl.modoIluminacion();
@@ -412,7 +455,7 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
       case '0':
       // ESTAMOS SELECCIONANDO LA LUZ POSICIONAL
          if (modoMenu==SELILUMINACION){
-            luces[0]->activar();
+            luces[0]->toggleEnabled();
             menu_ctl.activadaLuz(luces[0]->getActivada(), 0);
          }
          else
@@ -428,7 +471,7 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          }
          // ESTAMOS SELECCIONANDO LA LUZ DIRECCIONAL
          else if (modoMenu==SELILUMINACION){
-            luces[1]->activar();
+            luces[1]->toggleEnabled();
             menu_ctl.activadaLuz(luces[1]->getActivada(),1);
          }
          else
@@ -450,11 +493,11 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          case '<':
             // ESTAMOS VARIANDO EL ANGULO ALPHA
          if (modoMenu==VARALPHA){
-            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(-5.0);
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(-3.0);
          }
          // ESTAMOS VARIANDO EL ANGULO BETA
          else if (modoMenu==VARBETA){
-            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(-5.0);
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(-3.0);
          }
          else
             menu_ctl.noValido();
@@ -463,11 +506,11 @@ bool Escena::teclaPulsada( unsigned char tecla, int x, int y )
          case '>':
             // ESTAMOS VARIANDO EL ANGULO ALPHA
          if (modoMenu==VARALPHA){
-            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(5.0);
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloAlpha(3.0);
          }
          // ESTAMOS VARIANDO EL ANGULO BETA
          else if (modoMenu==VARBETA){
-            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(5.0);
+            dynamic_cast<LuzDireccional *>(luces[1])->variarAnguloBeta(3.0);
          }
          else
             menu_ctl.noValido();
@@ -558,11 +601,6 @@ void Escena::cambiar_visualizacion(ModoVisualizacion modo){
 }
 
 void Escena::cambiaTapas(){
-   /*cono->toggleTapas(inferior, superior);
-   cilindro->toggleTapas(inferior, superior);
-   esfera->toggleTapas(inferior, superior);
-   objrevo->toggleTapas(inferior, superior);*/
-
    // si es obj revolucion cambia las tapas
 
    for(auto it = objetos_escena.begin(); it != objetos_escena.end(); ++it)
@@ -571,6 +609,7 @@ void Escena::cambiaTapas(){
 }
 
 void Escena::ajustar_objeto(int i){
+   glScalef(escalas_objetos[i](EnumEjes::E_X),escalas_objetos[i](EnumEjes::E_Y),escalas_objetos[i](EnumEjes::E_Z));
    glTranslatef(pos_objetos[i](EnumEjes::E_X),pos_objetos[i](EnumEjes::E_Y),pos_objetos[i](EnumEjes::E_Z));
 }
 
@@ -580,4 +619,28 @@ GLenum Escena::toggle_sombreado(){
       sombreado = (*it)->toggleShadeMode();
 
    return sombreado;
+}
+
+float Escena::randomFloat(){
+   return static_cast<float>(rand())/static_cast<float>(RAND_MAX);
+}
+
+Tupla3f Escena::randomColor(){
+   return {randomFloat(), randomFloat(), randomFloat()};
+}
+
+void Escena::dibuja_objetos(){
+   for(int i = 0; i < objetos_escena.size(); ++i){
+      if(objeto_a_dibujar == Objetos(i) || objetos_escena[i]->get_visibility()){
+         glPushMatrix();
+            ajustar_objeto(i);
+            objetos_escena[i]->draw();
+         glPopMatrix();
+      }
+   }
+}
+
+void Escena::dibuja_luces(){
+   for(int i = 0; i < luces.size(); ++i)
+         luces[i]->activar();
 }

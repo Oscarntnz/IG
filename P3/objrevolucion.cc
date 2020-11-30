@@ -29,8 +29,6 @@ EnumEjes rotacion_eje, bool tapa_sup, bool tapa_inf, bool con_tapas): tabla_c(0)
 
    //crearPerfilDebug();
    crearMalla(perfil, instancias_perf, con_tapas);
-
-   escalar(10);
 }
 
 // *****************************************************************************
@@ -98,16 +96,23 @@ void ObjRevolucion::crearMalla(std::vector<Tupla3f> perfil_original, int num_ins
       f.push_back(*it);
    }
 
+   tam_sin_tapas = f.size();
+
    // Añadir polos y tapas
 
    v.push_back(polo_i);
    v.push_back(polo_s);
 
+   anadirTapas();
+
    if(conTapas)
-      anadirTapas();
+      tam_en_uso = tam_con_tapas;
    else
-      rellenar_vectores();
-   
+      tam_en_uso = tam_sin_tapas;
+
+   tapas = conTapas;
+
+   rellenar_vectores();
 }
 
 void ObjRevolucion::ordenarPuntos(){
@@ -168,21 +173,7 @@ void ObjRevolucion::anadirTapas(){
       }
    }
 
-   tapas = true;
-
-   rellenar_vectores();
-}
-
-void ObjRevolucion::eliminarTapas(){
-   int a = 0, b = 0,
-   iteraciones = (tiene_tapas.first? N : 0) + (tiene_tapas.second? N : 0);
-
-   for (int i = 0; i < iteraciones; i++)
-      f.pop_back();
-
-   tapas = false;
-
-   rellenar_vectores();
+   tam_con_tapas = f.size();
 }
 
 void ObjRevolucion::crearPerfilDebug(){
@@ -202,17 +193,16 @@ void ObjRevolucion::crearPerfilDebug(){
    else
       f.push_back({0,1,2});
 
-   escalar(7.5);
    rellenar_v_colores();
 }
 
 void ObjRevolucion::toggleTapas(){
    if(tapas)
-      eliminarTapas();
+      tam_en_uso = tam_sin_tapas;
    else
-      anadirTapas();
+      tam_en_uso = tam_con_tapas;
 
-   elimina_vbo();
+   tapas = !tapas;
 }
 
 std::pair<bool,bool> ObjRevolucion::crearPolos(){

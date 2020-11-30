@@ -40,8 +40,9 @@ class ObjRevolucion : public Malla3D
         // Atributos
         std::vector<Tupla3f> tabla_v;   // tabla de vértices
         std::vector<Tupla3i> tabla_c;   // tabla de caras
-        int M, N;                       // número de vértices del perfil y número de rotaciones
+        unsigned int M, N;             // número de vértices del perfil y número de rotaciones
         Tupla3f polo_s, polo_i;
+        unsigned int tam_con_tapas, tam_sin_tapas, tam_en_uso;
 
         // Funciones
 
@@ -52,6 +53,10 @@ class ObjRevolucion : public Malla3D
         void eliminarTapas();
         std::pair<bool,bool> crearPolos();      // calcula los polos, si no los tiene los crea, devuelve bool
                                                 // para saber si los tenia o no
+        inline virtual size_t getTamVCaras(){
+            return tam_en_uso;
+        }
+
     protected:
         // Atributos
 

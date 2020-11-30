@@ -8,6 +8,7 @@ void MenuCtl::menuPrincipal(){
     std::cout << "\tV: Seleccion modo de visualizacion" << std::endl;
     std::cout << "\tO: Seleccion de objeto" << std::endl;
     std::cout << "\tT: Cambiar tapas" << std::endl;
+    std::cout << "\tI: Cambiar iluminacion" << std::endl;
     std::cout << "\tQ: Salir de la aplicacion" << std::endl;
 }
 
@@ -32,7 +33,6 @@ void MenuCtl::selVisualizacion(){
     std::cout << "\tP: Modo puntos" << std::endl;
     std::cout << "\tL: Modo lineas" << std::endl;
     std::cout << "\tA: Modo ajedrez" << std::endl;
-    std::cout << "\tI: Modo iluminacion" << std::endl;
 }
 
 void MenuCtl::selDibujado(){

@@ -25,7 +25,7 @@ class Escena
     enum Objetos {CUBO = 0, TETRAEDRO = 1, PLY = 2, CILINDRO = 3, CONO = 4, ESFERA = 5, REVO = 6, NULO};
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
-    bool debug = true;
+    bool debug = false;
 
     //Funciones
     
@@ -34,6 +34,10 @@ class Escena
     void cambiaTapas();
     void ajustar_objeto(int i);
     GLenum toggle_sombreado();
+    float randomFloat();
+    Tupla3f randomColor();
+    void dibuja_objetos();
+    void dibuja_luces();
 
  // ** PARÁMETROS DE LA CÁMARA (PROVISIONAL)
        
@@ -52,7 +56,7 @@ class Escena
 
    void clear_window();
 
-   menu modoMenu=NADA;
+   menu modoMenu = NADA;
    // Objetos de la escena
    std::vector<Malla3D *> objetos_escena;
    Ejes ejes;
@@ -63,10 +67,13 @@ class Escena
    Cilindro * cilindro = nullptr;
    Esfera * esfera = nullptr;
    ObjRevolucion * objrevo = nullptr;
+   ObjRevolucion * objrevo2 = nullptr;
    std::vector<Luz *> luces;
 
    // Posiciones
    std::vector<Tupla3f> pos_objetos;
+   // Escalas
+   std::vector<Tupla3f> escalas_objetos;
 
    
    public:

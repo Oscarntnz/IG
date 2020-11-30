@@ -40,6 +40,8 @@ class Malla3D
    // o bien a 'draw_ModoDiferido' (modo diferido, VBOs)
    void draw();
 
+   void setColor(Tupla3f inmediato = color_i, Tupla3f diferido = color_d);
+
    inline void toggle_visibility(){    //Cambiar visibilidad
       visible = !visible;
    }
@@ -58,7 +60,6 @@ class Malla3D
 
    void cambiar_visualizacion(ModoVisualizacion modo);
    void mover(Tupla3f vector_despl);      //Mueve los vertices sumando los componentes del parametro
-   void escalar(float factor);
 
    inline void setMaterial(Material mat){
       m = mat;
@@ -78,10 +79,14 @@ class Malla3D
    // funciones privadas
 
    GLuint CrearVBO(GLuint tipo_vbo, GLuint tamanio_bytes, GLvoid * puntero_ram);
-   void dibuja(const std::vector<Tupla3i> & vect);
-   void dibuja_dif(const std::vector<Tupla3i> & vect, GLuint id);
+   void dibuja(const std::vector<Tupla3i> & vect, size_t tam);
+   void dibuja_dif(const std::vector<Tupla3i> & vect, GLuint id, size_t tam);
    void reserva_espacio(); // reserva espacio en todos los vectores una vez ya tenemos v y f
    void calculaTablaNormales();
+
+   inline virtual size_t getTamVCaras(){
+      return f.size();
+   }
 
    // atributos privados
 
@@ -132,12 +137,12 @@ class Malla3D
    std::vector<Tupla3f> c_a;        // tabla de colores para los triangulos negros visualizacion ajedrez
    std::vector<Tupla3f> c_a_2;      // tabla de colores para los triangulos blancos visualizacion ajedrez
 
-   Tupla3f color_i = {1.0,0.0,1.0};                // color modo inmediato
-   Tupla3f color_d = {0.0,1.0,1.0};                // color modo diferido
-   const Tupla3f color_puntos = {0.0,0.0,1.0};     // color de los puntos (azules)
-   const Tupla3f color_lineas = {1.0,0.0,0.0};     // color de las lineas (rojas)
-   const Tupla3f color_ajedrez_1 = {1.0,1.0,0.0};  // primer color modo ajedrez
-   const Tupla3f color_ajedrez_2 = {0.0,0.0,0.0};  // segundo color modo ajedrez
+   static const Tupla3f color_i;          // color modo inmediato
+   static const Tupla3f color_d;          // color modo diferido
+   static const Tupla3f color_puntos;     // color de los puntos (azules)
+   static const Tupla3f color_lineas;     // color de las lineas (rojas)
+   static const Tupla3f color_ajedrez_1;  // primer color modo ajedrez
+   static const Tupla3f color_ajedrez_2;  // segundo color modo ajedrez
 
    TipoMalla tipo_malla = TipoMalla::ESTANDAR;
 

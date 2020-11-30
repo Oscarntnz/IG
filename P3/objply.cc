@@ -8,7 +8,7 @@
 //
 // *****************************************************************************
 
-ObjPLY::ObjPLY(const std::string & nombre_archivo, float factor_escala)
+ObjPLY::ObjPLY(const std::string & nombre_archivo)
 {
    tipo_malla = TipoMalla::OBJPLY;
 
@@ -16,12 +16,9 @@ ObjPLY::ObjPLY(const std::string & nombre_archivo, float factor_escala)
    // leer la lista de caras y vértices
    ply::read(nombre_archivo, this->v, this->f);
    
-   escalar(factor_escala);
-
    //Inicializacion de los vectores de colores
 
-   rellenar_v_ajedrez();
-   rellenar_v_colores();
+   rellenar_vectores();
 }
 
 const std::string & ObjPLY::getNombre(){
