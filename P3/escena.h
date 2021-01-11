@@ -26,6 +26,7 @@ class Escena
     Objetos objeto_a_dibujar;
     MenuCtl menu_ctl;
     bool debug = false;
+    bool coloresAleatorios = true;
 
     //Funciones
     

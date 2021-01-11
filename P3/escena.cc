@@ -21,7 +21,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
    Observer_angle_x  = 0.0 ;
    Observer_angle_y  = 0.0 ;
    objeto_a_dibujar = Objetos::NULO;
-   srand(time(NULL));
+   if(coloresAleatorios)   srand(time(NULL));
 
    ejes.changeAxisSize(5000);
 
@@ -52,12 +52,14 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
 
    //Resto
 
-   cubo->setColor(randomColor(), randomColor());
-   tetraedro->setColor(randomColor(), randomColor());
-   objply->setColor(randomColor(), randomColor());
-   cilindro->setColor(randomColor(), randomColor());
-   cono->setColor(randomColor(), randomColor());
-   esfera->setColor(randomColor(), randomColor());
+   if(coloresAleatorios){
+      cubo->setColor(randomColor(), randomColor());
+      tetraedro->setColor(randomColor(), randomColor());
+      objply->setColor(randomColor(), randomColor());
+      cilindro->setColor(randomColor(), randomColor());
+      cono->setColor(randomColor(), randomColor());
+      esfera->setColor(randomColor(), randomColor());
+   }
 
    // emerald modificado
 
@@ -116,7 +118,7 @@ Escena::Escena(): menu_ctl(), objetos_escena(0), pos_objetos(0), luces(0), escal
    luces.push_back(new LuzPosicional({200.0, 0.0, 0.0}, GL_LIGHT0,
    {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 1.0}));
    luces.push_back(new LuzDireccional({M_PI,M_PI}, GL_LIGHT1,
-   {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0, 1.0, 1.0}));
+   {0.0, 0.0, 0.0, 1.0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0, 0.0, 1.0}));
 }
 
 //**************************************************************************
